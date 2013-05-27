@@ -5,6 +5,7 @@
 #define MAX_ION_PATH 260
 #define CACHE_PATH		"/mnt/cache/"
 #define DATA_PATH		"/mnt/data_center/"
+#define FIELD_OF(p,f)	((p)->f)
 #include<stdlib.h>
 #include<unistd.h>
 #include<stdio.h>
