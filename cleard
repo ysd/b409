@@ -1,0 +1,21 @@
+#!/bin/bash
+function cleard()
+{
+	if [ $# -ne 1 ] ;then
+		echo "usage : clear_d dir_to_be_cleared"
+		return 1
+	fi	
+	cd "$1"
+	if [ $? -ne 0 ] ;then
+		return 1
+	fi
+	for file in *
+	do
+		if [ -d $file ] ;then
+			continue
+		fi
+		rm -rf "$file"
+	done
+	cd - > /dev/null
+	return 0
+}

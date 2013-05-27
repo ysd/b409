@@ -1,0 +1,16 @@
+#!/bin/bash
+cache_d=/mnt/cache/
+dtc_d=/mnt/data_center/
+#rm tc file
+make clean
+for file in *
+do
+	if [[ "$file" = *.tch ]] ;then
+		rm "$file"
+	fi
+done
+#rm file in cache and data center
+. ./cleard
+cleard $cache_d
+cleard	$dtc_d
+exit 0
