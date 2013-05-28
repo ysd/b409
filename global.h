@@ -5,7 +5,12 @@
 #define MAX_ION_PATH 260
 #define CACHE_PATH		"/mnt/cache/"
 #define DATA_PATH		"/mnt/data_center/"
+
 #define FIELD_OF(p,f)	((p)->f)
+#define OFFSET_OF(member,type)		((u32) &((type*)0)->member)
+#define CONTAINER_OF(ptr,type,member)	({	\
+		typeof(((type*)0)->member) _fp = ptr;	\
+		(type*)((u8*)_fp - OFFSET_OF(member,type));	})
 #include<stdlib.h>
 #include<unistd.h>
 #include<stdio.h>
