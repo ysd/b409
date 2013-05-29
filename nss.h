@@ -23,47 +23,52 @@ enum{
 #define U_R	(G_R << 3)
 #define U_W	(G_W << 3)
 #define U_X	(G_X << 3)
-#define _uid(p)			FIELD_OF(p,uga[UID])
-#define _gid(p)			FIELD_OF(p,uga[GID])
-#define _acl(p)			FIELD_OF(p,uga[ACL])
-struct _user_object;
-struct _user_bucket;
-struct _user_directory;
-typedef struct _user_object{
-	name_zone_t o_name;
-	u16 uga[UGA];
-	struct list_head o_list;				/* next sibling */
-	struct list_head o_hash;
-	struct _user_bucket * bkt;				/* bucket which contains this file */
-}u_obj;
-#define OBJ_SZ	sizeof(u_obj)
-typedef struct _user_bucket{
-	name_zone_t b_name;
-	pthread_mutex_t mutex;
-	u16 uga[UGA];
-	struct list_head b_objects;				/* first child */
-	struct list_head b_list;				/* next sibling */
-	struct list_head b_hash;
-	struct list_head * object_hashtable;
-	struct _user_directory * ud;			/* home dir for this user */
-}u_bkt;
-#define BKT_SZ	sizeof(u_bkt)
-typedef struct _user_directory{
-	name_zone_t u_name;
-	pthread_mutex_t mutex;
-	u16 uga[UGA];
-	struct list_head d_buckets;				/* first child */
-	struct list_head d_list;				/* next sibling */
-	struct list_head d_hash;
-	struct list_head * bucket_hashtable;
-}u_dir;
-#define UDIR_SZ	sizeof(u_dir)
+#define get_uid(p)			((p)->uga[UID])
+#define get_gid(p)			((p)->uga[GID])
+#define get_acl(p)			((p)->uga[ACL])
+#define set_uid(p,v)		do{	\
+	(p)->uga[UID] = (v);	\
+}while(0)
+#define set_gid(p,v)		do{	\
+	(p)->uga[GID] = (v);	\
+}while(0)
+#define set_acl(p,v)		do{	\
+	(p)->uga[ACL] = (v);	\
+}while(0)
 typedef struct{
-	char * root;
 	pthread_mutex_t mutex;
-	u16 uga[UGA];
-	struct list_head r_udirs;				/* first user */
-	struct list_head * user_hashtable;
+	u16 uga[UGA];							/* uid + gid + acl */
+	struct list_head user_dirs;				/* head of user_dir list */
+	struct list_head * ud_hashtable;		/* user_dir hash table */
 }root_dir;
-#define ROOT_DIR	sizeof(root_dir)
+typedef struct{
+	pthread_mutex_t mutex;					/* mutex protecting this user_dir */
+	name_zone_t user_name;					/* user name */
+	u16 uga[UGA];							/* uid + gid + acl */
+	struct list_head d_list;				/* link to next user_dir */
+	struct list_head d_hash;				/* user_dir hash links */
+	struct list_head buckets;				/* head of buckets list for this user */
+	struct list_head * bucket_hashtable;	/* buckets hash table */
+}user_dir_t;
+typedef struct{
+	pthread_mutex_t mutex;					/* mutex protecting this bucket */
+	name_zone_t bucket_name;				/* bucket name */
+	u16 uga[UGA];							/* uid + gid + acl */
+	struct list_head b_list;				/* links to next bucket */
+	struct list_head b_hash;				/* bucket hash links */
+	struct list_head objects;				/* head of objects list in this bucket */
+	struct list_head * object_hashtable;	/* objects hash table */
+	user_dir_t * user_dir;					/* user_dir which this bucket belongs to */
+}bucket_t;
+typedef struct _user_object{
+	name_zone_t object_name;
+	u16 uga[UGA];							/* uid + gid + acl */
+	struct list_head o_list;				/* links to next object */
+	struct list_head o_hash;				/* object hash links */
+	bucket_t * bucket;						/* bucket which this object belongs to */
+}object_t;
+#define OBJECT_SZ		sizeof(object_t)
+#define BUCKET_SZ		sizeof(bucket_t)
+#define USER_DIR_SZ		sizeof(user_dir_t)
+#define ROOT_DIR_SZ		sizeof(root_dir)
 #endif

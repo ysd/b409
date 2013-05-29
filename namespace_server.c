@@ -48,8 +48,6 @@ static inline void free_list_head_table(struct list_head * lh)
 }
 static void init_root(void)
 {
-	bzero(&root,ROOT_DIR_SZ);
-	root.root = ROOT_DIR;
 	_uid(&root) = SU_UID;
 	_gid(&root) = SU_GID;
 	_acl(&root) |= (U_R | U_W | U_X);
@@ -58,4 +56,26 @@ static void init_root(void)
 	root.user_hashtable = alloc_list_head_table(USER_HASH_NR);
 	return;
 }
-static u_dir new_udir(char * dir_name)
+static user_dir_t * new_user_dir(name_zone_t user_name,u16 uid,u16 gid,u16 acl)
+{
+}
+static bucket_t * new_bucket(name_zone_t bucket_name,u16 uid,u16 gid,u16 acl)
+{
+}
+static object_t * new_object(name_zone_t object_name,u16 uid,u16 gid,u16 acl)
+{
+}
+static int add_user(char * user_name,u16 init_acl)
+{
+	/* 1) check if user with same name has already exist 
+	 * 2) if not,get a new user_dir_t for new user
+	 * 3) get_name_zone for new user 
+	 * 4) alloc hash_table for buckets of this user
+	 * 5) add to the user list and user hash table */
+}
+static int add_bucket(user_dir_t * user,char * bucket_name,u16 init_acl)
+{
+}
+static int add_object(bucket_t * bucket,char * object_name,u16 init_acl)
+{
+}
