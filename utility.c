@@ -1,5 +1,14 @@
 #include"global.h"
 #include"utility.h"
+void rand_generator(int a[],int len)
+{
+	int i;
+	for(i = 0;i < len;i++){
+		srand(time(NULL) + i);
+		a[i] = rand()%1000;
+	}
+	return;
+}
 int get_cache_path(char* path,char* cache_path)
 {
     char *p;

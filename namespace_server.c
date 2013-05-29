@@ -1,10 +1,10 @@
 #include"global.h"
 #include"list_head.h"
+#include"name_buf.h"
 #include"nss.h"
 #define OBJ_HASH_NR		4096
 #define BKT_HASH_NR		2048
 #define USER_HASH_NR	1024
-
 static inline int __hash(char * name,int hash_nr)
 {
 	unsigned int seed = 131;

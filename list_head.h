@@ -45,5 +45,5 @@ static inline void list_replace(struct list_head * n,struct list_head * o)
 	n->prev = o->prev;
 	n->prev->next = n;
 }
-#define for_each_list_head_between(p,s,e)	for(p=s->next;p!=e;p=p->next)
+#define for_each_list_head_between(p,s,e)	for(p=(s)->next;p!=(e);p=p->next)
 #define for_each_lhe(p,head)	for_each_list_head_between(p,head,head)

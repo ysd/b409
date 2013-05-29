@@ -1,4 +1,7 @@
+#ifndef _NSS_H
+#define _NSS_H
 #include"global.h"
+#include"name_buf.h"
 #define ROOT_DIR	"/"
 #define SHARED_DIR	"shared"
 /* /user_dir/bucket/object */
@@ -27,7 +30,7 @@ struct _user_object;
 struct _user_bucket;
 struct _user_directory;
 typedef struct _user_object{
-	u8 * o_name;
+	name_zone_t o_name;
 	u16 uga[UGA];
 	struct list_head o_list;				/* next sibling */
 	struct list_head o_hash;
@@ -35,7 +38,7 @@ typedef struct _user_object{
 }u_obj;
 #define OBJ_SZ	sizeof(u_obj)
 typedef struct _user_bucket{
-	u8 * b_name;
+	name_zone_t b_name;
 	pthread_mutex_t mutex;
 	u16 uga[UGA];
 	struct list_head b_objects;				/* first child */
@@ -46,7 +49,7 @@ typedef struct _user_bucket{
 }u_bkt;
 #define BKT_SZ	sizeof(u_bkt)
 typedef struct _user_directory{
-	u8 * u_name;
+	name_zone_t u_name;
 	pthread_mutex_t mutex;
 	u16 uga[UGA];
 	struct list_head d_buckets;				/* first child */
@@ -56,10 +59,11 @@ typedef struct _user_directory{
 }u_dir;
 #define UDIR_SZ	sizeof(u_dir)
 typedef struct{
-	u8 * root;
+	char * root;
 	pthread_mutex_t mutex;
 	u16 uga[UGA];
 	struct list_head r_udirs;				/* first user */
 	struct list_head * user_hashtable;
 }root_dir;
 #define ROOT_DIR	sizeof(root_dir)
+#endif
