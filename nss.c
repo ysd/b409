@@ -154,7 +154,7 @@ free_new_bucket_and_ret:
 ret:
 	return newo;
 }
-static int get_user_dir_by_name(char * name,void ** ptr,const u8 search_flag)
+static int get_user_dir_by_name(char * name,void ** ptr,const u8 op_style)
 {
 	/* search user_dir in user_hashtable
 	 * synchronization is needed
@@ -167,7 +167,7 @@ static int get_user_dir_by_name(char * name,void ** ptr,const u8 search_flag)
 	int rt = 1,i,len = strlen(name),uhash = u_hash(name);
 	user_dir_t * user;
 	struct list_head * l;
-	if(search_flag == OP_WITH_LOCK){
+	if(op_style == OP_WITH_LOCK){
 		if(pthread_mutex_lock(&u_hash_mutex) != 0){
 			perror("lock u_hash_mutex");
 			rt = 2;
@@ -190,7 +190,7 @@ static int get_user_dir_by_name(char * name,void ** ptr,const u8 search_flag)
 	}
 	*ptr = (void*)l;
 unlock_and_ret:
-	if(search_flag == OP_WITH_LOCK){
+	if(op_style == OP_WITH_LOCK){
 		if(pthread_mutex_unlock(&u_hash_mutex) != 0){
 			perror("unlock u_hash_mutex");
 			rt = 2;
@@ -199,12 +199,12 @@ unlock_and_ret:
 ret:
 	return rt;
 }
-static int get_bucket_by_name(char * name,user_dir_t * user,void ** ptr,const u8 search_flag)
+static int get_bucket_by_name(char * name,user_dir_t * user,void ** ptr,const u8 op_style)
 {
 	int rt = 1,i,len = strlen(name),bhash = b_hash(name,user);
 	bucket_t * bucket;
 	struct list_head * l;
-	if(search_flag == OP_WITH_LOCK){
+	if(op_style == OP_WITH_LOCK){
 		if(pthread_mutex_lock(&b_hash_mutex) != 0){
 			perror("lock b_hash_mutex");
 			rt = 2;
@@ -225,7 +225,7 @@ static int get_bucket_by_name(char * name,user_dir_t * user,void ** ptr,const u8
 	}
 	*ptr = (void*)l;
 unlock_and_ret:
-	if(search_flag == OP_WITH_LOCK){
+	if(op_style == OP_WITH_LOCK){
 		if(pthread_mutex_unlock(&b_hash_mutex) != 0){
 			perror("unlock b_hash_mutex");
 			rt = 2;
@@ -234,12 +234,12 @@ unlock_and_ret:
 ret:
 	return rt;
 }
-static int get_object_by_name(char * name,bucket_t * bucket,void ** ptr,u8 search_flag)
+static int get_object_by_name(char * name,bucket_t * bucket,void ** ptr,u8 op_style)
 {
 	int i,rt = 1,len = strlen(name),ohash = o_hash(name,bucket);
 	object_t * object;
 	struct list_head * l;
-	if(search_flag == OP_WITH_LOCK){
+	if(op_style == OP_WITH_LOCK){
 		if(pthread_mutex_lock(&o_hash_mutex) != 0){
 			perror("lock o_hash_mutex");
 			rt = 2;
@@ -259,7 +259,7 @@ static int get_object_by_name(char * name,bucket_t * bucket,void ** ptr,u8 searc
 	}
 	*ptr = (void*)l;
 unlock_and_ret:
-	if(search_flag == OP_WITH_LOCK){
+	if(op_style == OP_WITH_LOCK){
 		if(pthread_mutex_unlock(&o_hash_mutex) != 0){
 			perror("unlock o_hash_mutex");
 			rt = 2;
@@ -278,15 +278,15 @@ ret:
  *	are all in alphabetical order */
 static int add_user_to_ulist(user_dir_t * user)
 {
-	int rt = 0;
+	/* atomic operation */
 	struct list_head * l;
 	user_dir_t * u;
 	int len = strlen(*(user->user_name));
 	if(pthread_mutex_lock(&root_ptr->mutex) != 0){
 		perror("add user to ulist : lock root_ptr->mutex");
-		rt = 1;
-		goto ret;
+		return 1;
 	}
+	/* find the right place to insert to */
 	for_each_user(l){
 		u = container_of(l,user_dir_t,u_list);
 		if(strncmp(*(user->user_name),*(u->user_name),len) < 0){
@@ -296,21 +296,18 @@ static int add_user_to_ulist(user_dir_t * user)
 	list_add_tail(&user->u_list,l);
 	if(pthread_mutex_unlock(&root_ptr->mutex) != 0){
 		perror("add user to ulist : unlock root_ptr->mutex");
-		rt = 2;
+		return 2;
 	}
-ret:
-	return rt;
+	return 0;
 }
-static int add_bucket_to_blist(bucket_t * bucket,user_dir_t * user)
+static int add_bucket_to_blist(bucket_t * bucket)
 {
-	int rt = 0;
 	bucket_t * b;
 	struct list_head * l;
 	int len = strlen(*(bucket->bucket_name));
-	if(pthread_mutex_lock(&user->mutex) != 0){
-		perror("add bucket to blist : lock user->mutex");
-		rt = 1;
-		goto ret;
+	if(pthread_mutex_lock(&bucket->user_dir->mutex) != 0){
+		perror("add bucket to blist : lock bucket->user_dir->mutex");
+		return 1;
 	}
 	for_each_bucket(l,user){
 		b = container_of(l,bucket_t,b_list);
@@ -319,23 +316,21 @@ static int add_bucket_to_blist(bucket_t * bucket,user_dir_t * user)
 		}
 	}
 	list_add_tail(&bucket->b_list,l);
-	if(pthread_mutex_unlock(&root_ptr->mutex) != 0){
-		perror("add bucket to blist : unlock user->mutex");
-		rt = 2;
+	if(pthread_mutex_unlock(&bucket->user_dir->mutex) != 0){
+		perror("add bucket to blist : unlock bucket->user_dir->mutex");
+		return 2;
 	}
-ret:
-	return rt;
+	return 0;
 }
-static void add_object_to_olist(object_t * object,bucket_t * bucket)
+static int add_object_to_olist(object_t * object)
 {
 	int rt = 0;
 	object_t * o;
 	struct list_head * l;
 	int len = strlen(*(object->object_name));
-	if(pthread_mutex_lock(&bucket->mutex) != 0){
-		perror("add object to olist : lock bucket->mutex");
-		rt = 1;
-		goto ret;
+	if(pthread_mutex_lock(&object->bucket->mutex) != 0){
+		perror("add object to olist : lock object->bucket->mutex");
+		return 1;
 	}
 	for_each_object(l,bucket){
 		o = container_of(l,object_t,o_list);
@@ -344,12 +339,11 @@ static void add_object_to_olist(object_t * object,bucket_t * bucket)
 		}
 	}
 	list_add_tail(&object->o_list,l);
-	if(pthread_mutex_unlock(&bucket->mutex) != 0){
-		perror("add object to olist : unlock bucket->mutex");
-		rt = 2;
+	if(pthread_mutex_unlock(&object->bucket->mutex) != 0){
+		perror("add object to olist : unlock object->bucket->mutex");
+		return 2;
 	}
-ret:
-	return rt;
+	return 0;
 }
 /* add_user : This api is provided for application to add new user to the system */
 static int add_user(char * user_name)
@@ -386,6 +380,7 @@ unlock_and_ret:
 		rt = 1;
 	}
 	if(rt == 0){
+		/* add to user hash table succeeds! */
 		add_user_to_ulist(user);
 	}
 ret:
@@ -420,7 +415,7 @@ unlock_and_ret:
 		rt = 1;
 	}
 	if(rt == 0){
-		add_bucket_to_blist(bucket,user);
+		add_bucket_to_blist(bucket);
 	}
 ret:
 	return rt;
@@ -454,7 +449,7 @@ unlock_and_ret:
 		rt = 1;
 	}
 	if(rt == 0){
-		add_object_to_olist(object,bucket);
+		add_object_to_olist(object);
 	}
 ret:
 	return rt;
@@ -468,6 +463,8 @@ static int del_object_from_olist(object_t * object,const u8 op_style)
 		}
 	}
 	list_del(&object->o_list);
+	/* re_init object->o_list so that it will not reference other objects in olist */
+	list_head_init(&object->o_list);
 	if(op_style == OP_WITH_LOCK){
 		if(pthread_mutex_unlock(&object->bucket->mutex) != 0){
 			perror("del object : unlock obj->bucket->mutex");
@@ -485,6 +482,8 @@ static int del_object_from_oht(object_t * object,const u8 op_style)
 		}
 	}
 	list_del(&object->o_hash);
+	/* re_init object->o_hash so that it will not reference other objects in hashtable */
+	list_head_init(&object->o_hash);
 	if(op_style == OP_WITH_LOCK){
 		if(pthread_mutex_unlock(&o_hash_mutex) != 0){
 			perror("del object : unlock o_hash_mutex");
@@ -504,7 +503,7 @@ static int del_object(object_t * object)
 	 *	FOR EXAMPLE,ANOTHER PROCESS WANTS TO ADD AN OBJECT WHO SHARES
 	 *	NAME WITH CURRENT OBJECT IN THE SAME BUCKET,
 	 *	THAT ADD_OBJECT OPERATION WILL FAIL,
-	 *	BECAUSE THIS OBJECT IS STILL IN HASH TABLE.*/
+	 *	BECAUSE THIS DELETION IS NOT COMPLETE,THE OBJECT IS STILL IN HASH TABLE.*/
 	if(del_object_from_oht(object,OP_WITH_LOCK) != 0){
 		return 1;
 	}
@@ -521,6 +520,7 @@ static int del_bucket_from_blist(bucket_t * bucket,const u8 op_style)
 		}
 	}
 	list_del(&bucket->b_list);
+	list_head_init(&bucket->b_list);
 	if(op_style == OP_WITH_LOCK){
 		if(pthread_mutex_unlock(&bucket->user_dir->mutex) != 0){
 			perror("del bucket : unlock bucket->user_dir->mutex");
@@ -538,6 +538,7 @@ static int del_bucket_from_bht(bucket_t * bucket,const u8 op_style)
 		}
 	}
 	list_del(&bucket->b_hash);
+	list_head_init(&bucket->b_hash);
 	if(op_style == OP_WITH_LOCK){
 		if(pthread_mutex_unlock(&b_hash_mutex) != 0){
 			perror("del bucket : unlock b_hash_mutex");
@@ -561,19 +562,19 @@ static int del_bucket(bucket_t * bucket)
 	if(del_bucket_from_blist(bucket,OP_WITH_LOCK) != 0){
 		return 1;
 	}
-	/* here this bucket is still available through hash table,
+	/* here this bucket is still available in hash table,
 	 * which may cause some inconsistency,but not severe problem.*/
 	/* delete bucket from bucket hash table */
 	if(del_bucket_from_bht(bucket,OP_WITH_LOCK) != 0){
 		return 1;
 	}
 	/* now this bucket thoroughly disappears from the namespace,
-	 * next step,delete all its objects */
-	/* BUT WHAT IF SOME OTHER PROCESS GET THIS BUCKET WHEN THIS DELETION IS IN UNDEFINED STATE?
+	 * BUT WHAT IF SOME OTHER PROCESS GET THIS BUCKET WHEN THIS DELETION IS IN UNDEFINED STATE?
 	 * since we have bucket->mutex locked here.
 	 * THERE SHOULD BE A GENERAL PRINCIPLE THAT EVERY OPERATION 
 	 * WHICH MAY DO SOME MODIFICATION ON THE SHARED LIST SUCH AS B_LIST AND HASH_TABLE,
 	 * SHOULD ACCUIRE MUTEX FIRST! */
+	 /* next step,delete all its objects */
 	if(pthread_mutex_lock(&bucket->mutex) != 0){
 		return 1;
 	}
@@ -614,6 +615,7 @@ static int del_user_from_ulist(user_dir_t * user,const u8 op_style)
 		}
 	}
 	list_del(&user->u_list);
+	list_head_init(&user->u_list);
 	if(op_style == OP_WITH_LOCK){
 		if(pthread_mutex_unlock(&root_ptr->mutex) != 0){
 			perror("del user : unlock root_ptr->mutex");
@@ -631,6 +633,7 @@ static int del_user_from_uht(user_dir_t * user,const u8 op_style)
 		}
 	}
 	list_del(&user->u_hash);
+	list_head_init(&user->u_hash);
 	if(op_style == OP_WITH_LOCK){
 		if(pthread_mutex_unlock(&u_hash_mutex) != 0){
 			perror("del user : unlock u_hash_mutex");
@@ -657,17 +660,31 @@ static int del_user(user_dir_t * user)
 	}
 	for_each_bucket(l,user){
 		b = container_of(l,bucket_t,b_list);
-		del_bucket(b);
+		if(del_bucket(b) != 0){
+			return 1;
+		}
 	}
-	list_del(&user->u_list);
-	list_del(&user->u_hash);
 	pthread_mutex_destroy(&user->mutex);
 	put_name_zone(user->user_name);
 	free(user);
+	return 0;
+}
+static void list_user(void)
+{
 	return;
 }
+static void list_bucket(user_dir_t * user)
+{
+	return;
+}
+static void list_object(bucket_t * bucket)
+{
+	return;
+}
+/*
 static int do_s3_request(char * path)
 {
 	int rt = 0;
 	return rt;
 }
+*/
