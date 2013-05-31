@@ -1,4 +1,5 @@
 #include"global.h"
+#include"utility.h"
 #include"list_head.h"
 #include"name_buf.h"
 #include"nss.h"
@@ -669,16 +670,14 @@ static int del_user(user_dir_t * user)
 	free(user);
 	return 0;
 }
-static void list_user(void)
-{
-	return;
-}
 static void list_bucket(user_dir_t * user)
 {
+	xml_for_list_bucket(user);
 	return;
 }
 static void list_object(bucket_t * bucket)
 {
+	xml_for_list_object(bucket);
 	return;
 }
 /*
