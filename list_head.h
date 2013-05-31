@@ -1,3 +1,5 @@
+#ifndef _LIST_HEAD_H
+#define _LIST_HEAD_H
 struct list_head{
 	struct list_head * prev;
 	struct list_head * next;
@@ -47,3 +49,4 @@ static inline void list_replace(struct list_head * n,struct list_head * o)
 }
 #define for_each_list_head_between(p,s,e)	for(p=(s)->next;p!=(e);p=p->next)
 #define for_each_lhe(p,head)	for_each_list_head_between(p,head,head)
+#endif

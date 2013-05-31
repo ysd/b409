@@ -7,7 +7,7 @@
 /* /user_dir/bucket/object */
 #define ABS_PATH_FMT	"/%s/%s/%s"
 enum{
-	UID=0,
+	UID = 0,
 	GID,
 	ACL,
 	UGA
@@ -27,15 +27,15 @@ enum{
 #define get_gid(p)			((p)->uga[GID])
 #define get_acl(p)			((p)->uga[ACL])
 #define set_uid(p,v)		do{	\
-	typeof((p)->uid[0]) _v = (v);	\
+	typeof((p)->uga[0]) _v = (v);	\
 	(p)->uga[UID] = _v;	\
 }while(0)
 #define set_gid(p,v)		do{	\
-	typeof((p)->uid[0]) _v = (v);	\
+	typeof((p)->uga[0]) _v = (v);	\
 	(p)->uga[GID] = _v;	\
 }while(0)
 #define set_acl(p,v)		do{	\
-	typeof((p)->uid[0]) _v = (v);	\
+	typeof((p)->uga[0]) _v = (v);	\
 	(p)->uga[ACL] = _v;	\
 }while(0)
 typedef struct{
@@ -55,7 +55,7 @@ typedef struct{
 	name_zone_t bucket_name;		/* bucket name */
 	u16 uga[UGA];					/* uid + gid + acl */
 	struct list_head b_list;		/* links to next bucket */
-	struct list_head b_hash			/* bucket hash links */
+	struct list_head b_hash;		/* bucket hash links */
 	struct list_head objects;		/* head of objects list in this bucket */
 	user_dir_t * user_dir;			/* user_dir which this bucket belongs to */
 }bucket_t;
@@ -74,4 +74,22 @@ typedef struct _user_object{
 #define for_each_bucket(lh,user)	for_each_lhe(lh,&user->buckets)
 #define for_each_object(lh,bucket)	for_each_lhe(lh,&bucket->objects)
 #define for_each_hash(lh,hash)		for_each_lhe(lh,hash)
+extern pthread_mutex_t u_hash_mutex;
+extern pthread_mutex_t b_hash_mutex;
+extern pthread_mutex_t o_hash_mutex;
+extern struct list_head user_hashtable[];
+extern struct list_head bucket_hashtable[];
+extern struct list_head object_hashtable[];
+extern root_dir root;
+extern root_dir * root_ptr;
+extern void init_name_space(void);
+extern int add_user(char * user_name);
+extern int add_bucket(char * bucket_name,user_dir_t * user);
+extern int add_object(char * object_name,bucket_t * bucket);
+extern int del_object(object_t * object);
+extern int del_bucket(bucket_t * bucket);
+extern int del_user(user_dir_t * user);
+extern void get_absolute_path_of_object(object_t * object,char name_buf[]);
+extern void list_bucket(user_dir_t * user);
+extern void list_object(bucket_t * bucket);
 #endif

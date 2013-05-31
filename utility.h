@@ -9,5 +9,5 @@ _PROTOTYPE(int pthread_block_sig,(int signo));
 _PROTOTYPE(int pthread_unblock_sig,(int signo));
 _PROTOTYPE(void rand_generator,(int a[],int len,int limit));
 _PROTOTYPE(int xml_for_list_bucket,(user_dir_t * user));
-_PROTOTYPE(int xml_for_list_object(bucket_t * bucket));
+_PROTOTYPE(int xml_for_list_object,(bucket_t * bucket));
 #endif

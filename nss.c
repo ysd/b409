@@ -13,14 +13,14 @@
 #define OP_WITH_LOCK		00
 #define OP_WITHOUT_LOCK		01
 /* protect three hash tables */
-static pthread_mutex_t u_hash_mutex = PTHREAD_MUTEX_INITIALIZER;
-static pthread_mutex_t b_hash_mutex = PTHREAD_MUTEX_INITIALIZER;
-static pthread_mutex_t o_hash_mutex = PTHREAD_MUTEX_INITIALIZER;
-static struct list_head user_hashtable[USER_HASH_NR];
-static struct list_head bucket_hashtable[BKT_HASH_NR];
-static struct list_head object_hashtable[OBJ_HASH_NR];
-static root_dir root;
-static root_dir * root_ptr;
+pthread_mutex_t u_hash_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t b_hash_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t o_hash_mutex = PTHREAD_MUTEX_INITIALIZER;
+struct list_head user_hashtable[USER_HASH_NR];
+struct list_head bucket_hashtable[BKT_HASH_NR];
+struct list_head object_hashtable[OBJ_HASH_NR];
+root_dir root;
+root_dir * root_ptr;
 static inline int __hash(char * name,void * upper_dir,int hash_bits)
 {
 	unsigned int int_upper_d = (unsigned int)upper_dir;
@@ -53,7 +53,7 @@ static inline void init_hash_table(struct list_head * ht,int size)
 	}
 	return;
 }
-static void init_name_space(void)
+void init_name_space(void)
 {
 	root_ptr = &root;
 	pthread_mutex_init(&root_ptr->mutex,NULL);
@@ -86,7 +86,7 @@ static user_dir_t * new_user_dir(char * user_name,u16 uid,u16 gid,u16 acl)
 	list_head_init(&new_user->u_list);
 	list_head_init(&new_user->u_hash);
 	list_head_init(&new_user->buckets);
-	pthread_mutex_init(&new_user->mutex);
+	pthread_mutex_init(&new_user->mutex,NULL);
 	goto ret;
 free_new_user_and_ret:
 	free(new_user);
@@ -117,7 +117,7 @@ static bucket_t * new_bucket(char * bucket_name,u16 uid,u16 gid,u16 acl,user_dir
 	list_head_init(&newb->b_list);
 	list_head_init(&newb->b_hash);
 	list_head_init(&newb->objects);
-	pthread_mutex_init(&newb->mutex);
+	pthread_mutex_init(&newb->mutex,NULL);
 	newb->user_dir = user;
 	goto ret;
 free_new_bucket_and_ret:
@@ -147,10 +147,9 @@ static object_t * new_object(char * object_name,u16 uid,u16 gid,u16 acl,bucket_t
 	set_acl(newo,acl);
 	list_head_init(&newo->o_list);
 	list_head_init(&newo->o_hash);
-	pthread_mutex_init(&newo->mutex);
 	newo->bucket = bucket;
 	goto ret;
-free_new_bucket_and_ret:
+free_new_object_and_ret:
 	free(newo);
 ret:
 	return newo;
@@ -310,7 +309,7 @@ static int add_bucket_to_blist(bucket_t * bucket)
 		perror("add bucket to blist : lock bucket->user_dir->mutex");
 		return 1;
 	}
-	for_each_bucket(l,user){
+	for_each_bucket(l,bucket->user_dir){
 		b = container_of(l,bucket_t,b_list);
 		if(strncmp(*(bucket->bucket_name),*(b->bucket_name),len) < 0){
 			break;
@@ -333,7 +332,7 @@ static int add_object_to_olist(object_t * object)
 		perror("add object to olist : lock object->bucket->mutex");
 		return 1;
 	}
-	for_each_object(l,bucket){
+	for_each_object(l,object->bucket){
 		o = container_of(l,object_t,o_list);
 		if(strncmp(*(object->object_name),*(o->object_name),len) < 0){
 			break;
@@ -347,7 +346,7 @@ static int add_object_to_olist(object_t * object)
 	return 0;
 }
 /* add_user : This api is provided for application to add new user to the system */
-static int add_user(char * user_name)
+int add_user(char * user_name)
 {
 	/* 1) check if user with same name has already exist 
 	 * 2) if not,get a new user_dir_t for new user
@@ -387,7 +386,7 @@ unlock_and_ret:
 ret:
 	return rt;
 }
-static int add_bucket(char * bucket_name,user_dir_t * user)
+int add_bucket(char * bucket_name,user_dir_t * user)
 {
 	int rt = 0;
 	u16 uid,gid,acl;
@@ -408,7 +407,7 @@ static int add_bucket(char * bucket_name,user_dir_t * user)
 	uid = get_uid(user);
 	gid = get_gid(user);
 	acl = get_acl(user);
-	bucket = new_bucket(user_name,uid,gid,acl,user);
+	bucket = new_bucket(bucket_name,uid,gid,acl,user);
 	list_add_tail(&bucket->b_hash,l);
 unlock_and_ret:
 	if(pthread_mutex_unlock(&b_hash_mutex) != 0){
@@ -421,7 +420,7 @@ unlock_and_ret:
 ret:
 	return rt;
 }
-static int add_object(char * object_name,bucket_t * bucket)
+int add_object(char * object_name,bucket_t * bucket)
 {
 	int rt = 0;
 	u16 uid,gid,acl;
@@ -493,7 +492,7 @@ static int del_object_from_oht(object_t * object,const u8 op_style)
 	}
 	return 0;
 }
-static int del_object(object_t * object)
+int del_object(object_t * object)
 {
 	/* first delete from object list */
 	if(del_object_from_olist(object,OP_WITH_LOCK) != 0){
@@ -548,7 +547,7 @@ static int del_bucket_from_bht(bucket_t * bucket,const u8 op_style)
 	}
 	return 0;
 }
-static int del_bucket(bucket_t * bucket)
+int del_bucket(bucket_t * bucket)
 {
 	/* free a bucket after :
 	 * 1) it is removed from bucket_list
@@ -643,7 +642,7 @@ static int del_user_from_uht(user_dir_t * user,const u8 op_style)
 	}
 	return 0;
 }
-static int del_user(user_dir_t * user)
+int del_user(user_dir_t * user)
 {
 	/* free a user_dir after : 
 	 * 1) it is removed from user_hashtable
@@ -670,15 +669,54 @@ static int del_user(user_dir_t * user)
 	free(user);
 	return 0;
 }
-static void list_bucket(user_dir_t * user)
+void get_absolute_path_of_object(object_t * object,char name_buf[])
+{
+	bzero(name_buf,MAX_PATH);
+	snprintf(name_buf,MAX_PATH,ABS_PATH_FMT,*(object->bucket->user_dir->user_name),\
+			*(object->bucket->bucket_name),*(object->object_name));
+	return;
+}
+/*
+void list_bucket(user_dir_t * user)
 {
 	xml_for_list_bucket(user);
 	return;
 }
-static void list_object(bucket_t * bucket)
+void list_object(bucket_t * bucket)
 {
 	xml_for_list_object(bucket);
 	return;
+}
+*/
+static void prt_ulist(void)
+{
+	struct list_head * l;
+	user_dir_t * u;
+	printf("------- user_list : \n");
+	for_each_user(l){
+		u = container_of(l,user_dir_t,u_list);
+		printf("%s\n",*(u->user_name));
+	}
+}
+static void prt_blist(user_dir_t * user)
+{
+	struct list_head * l;
+	bucket_t * b;
+	printf("user -- %s\n",*(user->user_name));
+	for_each_bucket(l,user){
+		b = container_of(l,bucket_t,b_list);
+		printf("%s\n",*(b->bucket_name));
+	}
+}
+static void prt_olist(bucket_t * bucket)
+{
+	struct list_head * l;
+	object_t * o;
+	printf("bucket -- %s\n",*(bucket->bucket_name));
+	for_each_object(l,bucket){
+		o = container_of(l,object_t,o_list);
+		printf("%s\n",*(o->object_name));
+	}
 }
 /*
 static int do_s3_request(char * path)
@@ -687,3 +725,13 @@ static int do_s3_request(char * path)
 	return rt;
 }
 */
+int main()
+{
+	init_name_space();
+	add_user("super_user");
+	add_user("super_useri1");
+	add_user("super_user2");
+	add_user("super_user");
+	prt_ulist();
+	return 0;
+}
