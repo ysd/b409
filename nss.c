@@ -1,17 +1,10 @@
 #include"global.h"
-#include"utility.h"
 #include"list_head.h"
 #include"name_buf.h"
+/*
+#include"xml.h"
+*/
 #include"nss.h"
-#define BITS_OF_INT		32
-#define OBJ_HASH_BITS	12
-#define BKT_HASH_BITS	11
-#define USER_HASH_BITS	10
-#define OBJ_HASH_NR		(1 << OBJ_HASH_BITS)
-#define BKT_HASH_NR		(1 << BKT_HASH_BITS)
-#define USER_HASH_NR	(1 << USER_HASH_BITS)
-#define OP_WITH_LOCK		00
-#define OP_WITHOUT_LOCK		01
 /* protect three hash tables */
 pthread_mutex_t u_hash_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t b_hash_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -21,12 +14,31 @@ struct list_head bucket_hashtable[BKT_HASH_NR];
 struct list_head object_hashtable[OBJ_HASH_NR];
 root_dir root;
 root_dir * root_ptr;
+static inline void init_hash_table(struct list_head * ht,int size)
+{
+	int i;
+	for(i=0;i<size;i++){
+		list_head_init(&ht[i]);
+	}
+	return;
+}
+void init_name_space(void)
+{
+	/* init namespace server */
+	root_ptr = &root;
+	pthread_mutex_init(&root_ptr->mutex,NULL);
+	list_head_init(&root_ptr->user_dirs);
+	init_hash_table(user_hashtable,USER_HASH_NR);
+	init_hash_table(bucket_hashtable,BKT_HASH_NR);
+	init_hash_table(object_hashtable,OBJ_HASH_NR);
+	return;
+}
 static inline int __hash(char * name,void * upper_dir,int hash_bits)
 {
-	unsigned int int_upper_d = (unsigned int)upper_dir;
-	unsigned int seed = 131;
-	unsigned int hash = 0;
-	unsigned char * p = (unsigned char *)name;
+	int int_upper_d = (int)upper_dir;
+	int seed = 131;
+	int hash = 0;
+	char * p = name;
 	while(*p != '\0'){
 		hash = hash * seed + (*p++);
 	}
@@ -44,24 +56,6 @@ static inline int b_hash(char * bucket_name,user_dir_t * user_dir)
 static inline int u_hash(char * user_name)
 {
 	return __hash(user_name,(void*)root_ptr,USER_HASH_BITS);
-}
-static inline void init_hash_table(struct list_head * ht,int size)
-{
-	int i;
-	for(i=0;i<size;i++){
-		list_head_init(&ht[i]);
-	}
-	return;
-}
-void init_name_space(void)
-{
-	root_ptr = &root;
-	pthread_mutex_init(&root_ptr->mutex,NULL);
-	list_head_init(&root_ptr->user_dirs);
-	init_hash_table(user_hashtable,USER_HASH_NR);
-	init_hash_table(bucket_hashtable,BKT_HASH_NR);
-	init_hash_table(object_hashtable,OBJ_HASH_NR);
-	return;
 }
 static user_dir_t * new_user_dir(char * user_name,u16 uid,u16 gid,u16 acl)
 {
@@ -688,7 +682,8 @@ void list_object(bucket_t * bucket)
 	return;
 }
 */
-static void prt_ulist(void)
+/* for debug */
+void prt_ulist(void)
 {
 	struct list_head * l;
 	user_dir_t * u;
@@ -698,7 +693,7 @@ static void prt_ulist(void)
 		printf("%s\n",*(u->user_name));
 	}
 }
-static void prt_blist(user_dir_t * user)
+void prt_blist(user_dir_t * user)
 {
 	struct list_head * l;
 	bucket_t * b;
@@ -708,7 +703,7 @@ static void prt_blist(user_dir_t * user)
 		printf("%s\n",*(b->bucket_name));
 	}
 }
-static void prt_olist(bucket_t * bucket)
+void prt_olist(bucket_t * bucket)
 {
 	struct list_head * l;
 	object_t * o;
@@ -725,13 +720,3 @@ static int do_s3_request(char * path)
 	return rt;
 }
 */
-int main()
-{
-	init_name_space();
-	add_user("super_user");
-	add_user("super_useri1");
-	add_user("super_user2");
-	add_user("super_user");
-	prt_ulist();
-	return 0;
-}

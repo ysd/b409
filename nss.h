@@ -74,22 +74,13 @@ typedef struct _user_object{
 #define for_each_bucket(lh,user)	for_each_lhe(lh,&user->buckets)
 #define for_each_object(lh,bucket)	for_each_lhe(lh,&bucket->objects)
 #define for_each_hash(lh,hash)		for_each_lhe(lh,hash)
-extern pthread_mutex_t u_hash_mutex;
-extern pthread_mutex_t b_hash_mutex;
-extern pthread_mutex_t o_hash_mutex;
-extern struct list_head user_hashtable[];
-extern struct list_head bucket_hashtable[];
-extern struct list_head object_hashtable[];
-extern root_dir root;
-extern root_dir * root_ptr;
-extern void init_name_space(void);
-extern int add_user(char * user_name);
-extern int add_bucket(char * bucket_name,user_dir_t * user);
-extern int add_object(char * object_name,bucket_t * bucket);
-extern int del_object(object_t * object);
-extern int del_bucket(bucket_t * bucket);
-extern int del_user(user_dir_t * user);
-extern void get_absolute_path_of_object(object_t * object,char name_buf[]);
-extern void list_bucket(user_dir_t * user);
-extern void list_object(bucket_t * bucket);
+#define BITS_OF_INT		(8*sizeof(int))
+#define OBJ_HASH_BITS	12
+#define BKT_HASH_BITS	11
+#define USER_HASH_BITS	10
+#define OBJ_HASH_NR		(1 << OBJ_HASH_BITS)
+#define BKT_HASH_NR		(1 << BKT_HASH_BITS)
+#define USER_HASH_NR	(1 << USER_HASH_BITS)
+#define OP_WITH_LOCK		00
+#define OP_WITHOUT_LOCK		01
 #endif
