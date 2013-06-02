@@ -11,13 +11,7 @@ extern int del_user(user_dir_t * user);
 extern void get_absolute_path_of_object(object_t * object,char name_buf[]);
 extern void list_bucket(user_dir_t * user);
 extern void list_object(bucket_t * bucket);
-extern void prt_olist(bucket_t * bucket);
-extern void prt_blist(user_dir_t * user);
-extern void prt_ulist(void);
 extern int get_user_dir_by_name(char * name,void ** ptr,const u8 op_style);
 extern int get_bucket_by_name(char * name,user_dir_t * user,void ** ptr,const u8 op_style);
 extern int get_object_by_name(char * name,bucket_t * bucket,void ** ptr,const u8 op_style);
-extern void prt_uhash(void);
-extern void prt_bhash(void);
-extern void prt_ohash(void);
 #endif
