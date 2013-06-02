@@ -81,7 +81,7 @@ typedef struct _user_object{
 #define OBJ_HASH_NR		(1 << OBJ_HASH_BITS)
 #define BKT_HASH_NR		(1 << BKT_HASH_BITS)
 #define USER_HASH_NR	(1 << USER_HASH_BITS)
-#define GET_HASH_MASK(hm,hash_bits)	do{	\
+#define init_hash_mask(hm,hash_bits)	do{	\
 	int i;	\
 	hm = 0;	\
 	for(i=0;i<hash_bits;i++){	\
