@@ -81,6 +81,10 @@ typedef struct _user_object{
 #define OBJ_HASH_NR		(1 << OBJ_HASH_BITS)
 #define BKT_HASH_NR		(1 << BKT_HASH_BITS)
 #define USER_HASH_NR	(1 << USER_HASH_BITS)
+#define U_HASH_MASK		(USER_HASH_NR - 1)
+#define B_HASH_MASK		(BKT_HASH_NR - 1)
+#define O_HASH_MASK		(OBJ_HASH_NR - 1)
+/*
 #define init_hash_mask(hm,hash_bits)	do{	\
 	int i;	\
 	hm = 0;	\
@@ -88,6 +92,7 @@ typedef struct _user_object{
 		hm |= (1<<i);	\
 	}	\
 }while(0)
+*/
 #define OP_WITH_LOCK		00
 #define OP_WITHOUT_LOCK		01
 #endif

@@ -11,16 +11,12 @@ struct list_head bucket_hashtable[BKT_HASH_NR];
 struct list_head object_hashtable[OBJ_HASH_NR];
 root_dir root;
 root_dir * root_ptr;
-static int u_hashmask;
-static int b_hashmask;
-static int o_hashmask;
 static inline void init_hash_table(struct list_head * ht,int size)
 {
 	int i;
 	for(i=0;i<size;i++){
 		list_head_init(&ht[i]);
 	}
-	return;
 }
 int init_name_space(void)
 {
@@ -37,9 +33,6 @@ int init_name_space(void)
 	init_hash_table(object_hashtable,OBJ_HASH_NR);
 	/* init name_buf */
 	init_name_buf();
-	init_hash_mask(u_hashmask,USER_HASH_BITS);
-	init_hash_mask(b_hashmask,BKT_HASH_BITS);
-	init_hash_mask(o_hashmask,OBJ_HASH_BITS);
 	return 0;
 }
 static inline int __hash(char * name,void * upper_dir,int hash_mask)
@@ -56,15 +49,15 @@ static inline int __hash(char * name,void * upper_dir,int hash_mask)
 }
 static inline int o_hash(char * obj_name,bucket_t * bucket)
 {
-	return __hash(obj_name,(void*)bucket,o_hashmask);
+	return __hash(obj_name,(void*)bucket,O_HASH_MASK);
 }
 static inline int b_hash(char * bucket_name,user_dir_t * user_dir)
 {
-	return __hash(bucket_name,(void*)user_dir,b_hashmask);
+	return __hash(bucket_name,(void*)user_dir,B_HASH_MASK);
 }
 static inline int u_hash(char * user_name)
 {
-	return __hash(user_name,(void*)root_ptr,u_hashmask);
+	return __hash(user_name,(void*)root_ptr,U_HASH_MASK);
 }
 static inline void simple_del_object_from_olist(object_t * object)
 {
@@ -194,7 +187,6 @@ free_new_user_and_ret:
 ret:
 	return new_user;
 }
-
 static inline void de_object(object_t * object)
 {
 	put_name_zone(object->object_name);
@@ -399,18 +391,30 @@ int get_object(char * object_name,char * bucket_name,char * user_name)
 		rt = 1;
 		goto ret;
 	}
+	/* what if this user is deleted here?
+	 * 1) get_bucket_by_name may fail if bucket is deleted too
+	 * 2) get_bucket_by_name may not fail if bucket has not been deleted.
+	 *    if so,we can still get the bucket which may be deleted soon.
+	 *    here we just assume that the bucket is available */
 	u = (user_dir_t*)ol;
 	if(get_bucket_by_name(bucket_name,u,&ol,OP_WITH_LOCK) != 1){
 		fprintf(stderr,"get_bucket_by_name fail!\n");
 		rt = 2;
 		goto ret;
 	}
+	/* what if this bucket is deleted here? 
+	 * just as we talked above,if the get_object_by_name succeeds,
+	 * than get_object will be successful,otherwise get_object will fail. */
 	b = (bucket_t*)ol;
 	if(get_object_by_name(object_name,b,&ol,OP_WITH_LOCK) != 1){
 		fprintf(stderr,"get_object_by_name fail!\n");
 		rt = 3;
 		goto ret;
 	}
+	/* what if the object is deleted here?
+	 * get_object will still be successful.
+	 * but in the operation on this object such as getting the real data of the object may fail,
+	 * if the real object is deleted! */
 	o = (object_t*)ol;
 	/* do some access control check here */
 	/* here we just print the object name to notify that get_object is ok */

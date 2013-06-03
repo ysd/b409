@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sock_msg>
+  <type>M</type>
+  <dest_ip>127.0.0.1</dest_ip>
+  <file_name>testfile</file_name>
+</sock_msg>

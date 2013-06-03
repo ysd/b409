@@ -1,14 +1,13 @@
-#inlcude"global.h"
+#include"global.h"
 #include"nss.h"
 #include"list_head.h"
 #include"xml.h"
 #include<libxml/parser.h>
 #include<libxml/tree.h>
-int xml_for_list_bucket(user_dir_t * user)
+int xml_for_list_bucket(user_dir_t * user,char * xml_file)
 {
 	struct list_head * l;
 	bucket_t * bucket;
-//	char * dest_file;
 	u8  buf[XML_BUFSZ];
 	xmlDocPtr doc = NULL;
 	xmlNodePtr root_node = NULL;
@@ -19,18 +18,17 @@ int xml_for_list_bucket(user_dir_t * user)
 		bucket = container_of(l,bucket_t,b_list);
 		xmlNewChild(root_node,NULL,BAD_CAST *(bucket->bucket_name),BAD_CAST buf);
 	}
-//	xmlSaveFormatFileEnc(dest_file,doc,"UTF-8",1);
-	xmlSaveFormatFileEnc("-",doc,"UTF-8",1);
+	xmlSaveFormatFileEnc(xml_file,doc,"UTF-8",1);
+//	xmlSaveFormatFileEnc("-",doc,"UTF-8",1);
 	xmlFreeDoc(doc);
 	xmlCleanupParser();
 	xmlMemoryDump();
 	return 0;
 }
-int xml_for_list_object(bucket_t * bucket)
+int xml_for_list_object(bucket_t * bucket,char * xml_file)
 {
 	struct list_head * l;
 	object_t * object;
-//	char * dest_file;
 	u8  buf[XML_BUFSZ];
 	xmlDocPtr doc = NULL;
 	xmlNodePtr root_node = NULL;
@@ -41,10 +39,13 @@ int xml_for_list_object(bucket_t * bucket)
 		object = container_of(l,object_t,o_list);
 		xmlNewChild(root_node,NULL,BAD_CAST *(object->object_name),BAD_CAST buf);
 	}
-//	xmlSaveFormatFileEnc(dest_file,doc,"UTF-8",1);
-	xmlSaveFormatFileEnc("-",doc,"UTF-8",1);
+	xmlSaveFormatFileEnc(xml_file,doc,"UTF-8",1);
+//	xmlSaveFormatFileEnc("-",doc,"UTF-8",1);
 	xmlFreeDoc(doc);
 	xmlCleanupParser();
 	xmlMemoryDump();
 	return 0;
+}
+int list_all_buckets_and_objects(user_dir_t * user,char * xml_file)
+{
 }
