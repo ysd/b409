@@ -205,7 +205,7 @@ static inline void de_user_dir(user_dir_t * user)
 	free(user);
 }
 /* get object from object hash table */
-static int get_object_by_name(char * name,bucket_t * bucket,void ** ptr,const u8 op_style)
+int get_object_by_name(char * name,bucket_t * bucket,void ** ptr,const u8 op_style)
 {
 	/* return value:
 	 * 1) 0 : no object found,but the list_head_ptr 
@@ -243,7 +243,7 @@ unlock_and_ret:
 ret:
 	return rt;
 }
-static int get_bucket_by_name(char * name,user_dir_t * user,void ** ptr,const u8 op_style)
+int get_bucket_by_name(char * name,user_dir_t * user,void ** ptr,const u8 op_style)
 {
 	int rt = 0,i,len,bhash;
 	bucket_t * bucket;
@@ -277,7 +277,7 @@ unlock_and_ret:
 ret:
 	return rt;
 }
-static int get_user_dir_by_name(char * name,void ** ptr,const u8 op_style)
+int get_user_dir_by_name(char * name,void ** ptr,const u8 op_style)
 {
 	int rt = 0,i,len,uhash;
 	user_dir_t * user;
@@ -441,6 +441,7 @@ int put_object(char * object_name,char * bucket_name,char * user_name)
 	}
 	u = (user_dir_t*)ol;
 	if(get_bucket_by_name(bucket_name,u,&ol,OP_WITH_LOCK) != 1){
+		fprintf(stderr,"get_bucket_by_name fail!\n");
 		rt = 2;
 		goto ret;
 	}
@@ -619,12 +620,20 @@ int get_bucket(char * bucket_name,char * user_name)
 	}
 	b = (bucket_t*)ol;
 	printf("bucket --- %s\n",bucket_name);
+	if(list_empty(&b->objects)){
+		goto ret;
+	}
+	if(pthread_mutex_lock(&b->mutex) != 0){
+		perror("lock bucket->mutex");
+		goto ret;
+	}
 	for_each_object(l,b){
 		o = container_of(l,object_t,o_list);
 		/* collect object info in xml format */
 		printf(" %s ",*(o->object_name));
 	}
 	printf("\n");
+	pthread_mutex_unlock(&b->mutex);
 ret:
 	return rt;
 }
@@ -751,9 +760,34 @@ static int atomic_del_buckets(user_dir_t * user)
 	}
 	return 0;
 }
-int get_user(char * user)
+int get_user(char * user_name)
 {
 	/* list bucket */
+	int rt = 0;
+	user_dir_t * u;
+	bucket_t * b;
+	struct list_head * l;
+	void * bl;
+	if(get_user_dir_by_name(user_name,&bl,OP_WITH_LOCK) != 1){
+		fprintf(stderr,"user not exist!\n");
+		rt = 1;
+		goto ret;
+	}
+	u = (user_dir_t*)bl;
+	if(list_empty(&u->buckets)){
+		goto ret;
+	}
+	if(pthread_mutex_lock(&u->mutex) != 0){
+		perror("get_user : pthread_mutex_lock u->mutex");
+		rt = 2;
+		goto ret;
+	}
+	for_each_bucket(l,u){
+		b = container_of(l,bucket_t,b_list);
+		printf("%s\n",*(b->bucket_name));
+	}
+	pthread_mutex_unlock(&u->mutex);
+ret:
 	return 0;
 }
 int put_user(char * user_name)

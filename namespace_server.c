@@ -2,10 +2,45 @@
 #include"utility.h"
 #include"list_head.h"
 #include"name_buf.h"
-/*
-#include"xml.h"
-*/
 #include"nss_api.h"
+#define _XML
+#ifdef _XML
+#include<libxml/parser.h>
+#include<libxml/tree.h>
+static char * buf = "test";
+int list_all_buckets_and_objects(user_dir_t * user,char * xml_file)
+{
+	struct list_head * l,*x;
+	bucket_t * bucket;
+	object_t * object;
+	xmlDocPtr doc = NULL;
+	xmlNodePtr root_node = NULL,bnode;
+	doc = xmlNewDoc(BAD_CAST "1.0");
+	root_node = xmlNewNode(NULL,BAD_CAST *(user->user_name));
+	xmlDocSetRootElement(doc,root_node);
+	if(list_empty(&user->buckets)){
+		goto ret;
+	}
+	for_each_bucket(l,user){
+		bucket = container_of(l,bucket_t,b_list);
+		bnode = xmlNewChild(root_node,NULL,BAD_CAST *(bucket->bucket_name),BAD_CAST buf);
+		if(list_empty(&bucket->objects)){
+			continue;
+		}
+		for_each_object(x,bucket){
+			object = container_of(x,object_t,o_list);
+			xmlNewChild(bnode,NULL,BAD_CAST *(object->object_name),BAD_CAST buf);
+		}
+	}
+ret:
+	xmlSaveFormatFileEnc(xml_file,doc,"UTF-8",1);
+//	xmlSaveFormatFileEnc("-",doc,"UTF-8",1);
+	xmlFreeDoc(doc);
+	xmlCleanupParser();
+	xmlMemoryDump();
+	return 0;
+}
+#endif
 #define U1	"u1"
 #define U2	"u2"
 #define U3	"u3"
@@ -41,109 +76,61 @@
 #define O13	"o13"
 int main()
 {
+	int i;
 	user_dir_t * u;
 	bucket_t * b;
 	object_t * o;
 	init_name_space();
-	add_user("super_user");
-	add_user(U1);
-	add_user(U2);
-	add_user(U3);
-	add_user(U4);
-	add_user(U5);
-	add_user(U6);
-	add_user(U7);
-	add_user(U8);
-	add_user(U9);
-	add_user(U10);
-	add_user(U11);
-	add_user(U12);
+	put_user(U1);
+	put_user(U2);
+	put_user(U3);
+	put_user(U4);
+	put_user(U5);
+	put_user(U6);
+	put_user(U7);
+	put_user(U8);
+	put_user(U9);
+	put_user(U10);
+	put_user(U11);
+	put_user(U12);
 	prt_ulist();
 	prt_uhash();
 	printf("----------------------\n");
-//	printf("del 6\n");
-//	if(get_user_dir_by_name(U6,(void**)&u,OP_WITH_LOCK) == 0){
-//		del_user(u);
-//	}
-//	prt_ulist();
-//	prt_uhash();
-//	printf("del 10\n");
-//	if(get_user_dir_by_name(U10,(void**)&u,OP_WITH_LOCK) == 0){
-//		del_user(u);
-//	}
-//	prt_ulist();
-//	prt_uhash();
-	if(get_user_dir_by_name(U4,(void**)&u,OP_WITH_LOCK) == 0){
-		add_bucket(B1,u);
-		add_bucket(B2,u);
-		add_bucket(B3,u);
-		add_bucket(B4,u);
-		add_bucket(B5,u);
-		prt_blist(u);
-		prt_bhash();
-//		if(get_bucket_by_name(B2,u,(void**)&b,OP_WITH_LOCK) == 0){
-//			printf("-- del b2 -- \n");
-//			del_bucket(b);
-//			prt_blist(u);
-//			prt_bhash();
-//		}
-//		if(get_bucket_by_name(B4,u,(void**)&b,OP_WITH_LOCK) == 0){
-//			printf("-- del b3 -- \n");
-//			del_bucket(b);
-//			prt_blist(u);
-//			prt_bhash();
-//		}
-//		if(get_bucket_by_name(B1,u,(void**)&b,OP_WITH_LOCK) == 0){
-//			printf("-- del b4 -- \n");
-//			del_bucket(b);
-//			prt_blist(u);
-//			prt_bhash();
-//		}
-		if(get_bucket_by_name(B3,u,(void**)&b,OP_WITH_LOCK) == 0){
-			add_object(O1,b);
-			add_object(O2,b);
-			add_object(O3,b);
-			add_object(O4,b);
-			add_object(O5,b);
-			add_object(O6,b);
-			add_object(O6,b);
-			add_object(O7,b);
-			prt_olist(b);
-			prt_ohash();
-//			if(get_object_by_name(O2,b,(void**)&o,OP_WITH_LOCK) == 0){
-//				printf("del o2\n");
-//				del_object(o);
-//				prt_olist(b);
-//				prt_ohash();
-//			}
-//			if(get_object_by_name(O3,b,(void**)&o,OP_WITH_LOCK) == 0){
-//				printf("del o3\n");
-//				del_object(o);
-//				prt_olist(b);
-//				prt_ohash();
-//			}
-//			if(get_object_by_name(O7,b,(void**)&o,OP_WITH_LOCK) == 0){
-//				printf("del o7\n");
-//				del_object(o);
-//				prt_olist(b);
-//				prt_ohash();
-//			}
-//			if(get_object_by_name(O4,b,(void**)&o,OP_WITH_LOCK) == 0){
-//				printf("del o4\n");
-//				del_object(o);
-//				prt_olist(b);
-//				prt_ohash();
-//			}
-//			printf("now del b3,but still objects in b3...let's see what will happen!\n");
-//			if(del_bucket(b) != 0){
-//				fprintf(stderr,"del b3 fail!\n");
-//			}
-//			prt_blist(u);
-//			prt_bhash();
-		}
+	put_bucket(B1,U5);
+	put_bucket(B2,U5);
+	put_bucket(B3,U5);
+	put_bucket(B4,U5);
+	put_bucket(B5,U5);
+	get_user_dir_by_name(U5,(void**)&u,OP_WITH_LOCK);
+	prt_blist(u);
+	prt_bhash();
+	printf("----------------------\n");
+	if(put_object(O1,B3,U5) == 0){
+		printf("put o1 ok\n");
 	}
-	del_user(u);
-	prt_ulist();
-	prt_uhash();
+	if(put_object(O2,B3,U5) == 0){
+		printf("put o2 ok\n");
+	}
+	if(put_object(O3,B3,U5) == 0){
+		printf("put o3 ok\n");
+	}
+	if(put_object(O4,B3,U5) == 0){
+		printf("put o4 ok\n");
+	}
+	if(put_object(O5,B3,U5) == 0){
+		printf("put o5 ok\n");
+	}
+	if(put_object(O6,B3,U5) == 0){
+		printf("put o6 ok\n");
+	}
+	if(put_object(O7,B3,U5) == 0){
+		printf("put o7 ok\n");
+	}
+	get_bucket_by_name(B3,u,(void**)&b,OP_WITH_LOCK);
+	prt_olist(b);
+	prt_ohash();
+	if(list_all_buckets_and_objects(u,"zz.xml") != 0){
+		fprintf(stderr,"xml fail!\n");
+	}
 	return 0;
 }
