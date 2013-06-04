@@ -2,45 +2,8 @@
 #include"utility.h"
 #include"list_head.h"
 #include"name_buf.h"
-#include"nss_api.h"
-#define _XML
-#ifdef _XML
-#include<libxml/parser.h>
-#include<libxml/tree.h>
-static char * buf = "test";
-int list_all_buckets_and_objects(user_dir_t * user,char * xml_file)
-{
-	struct list_head * l,*x;
-	bucket_t * bucket;
-	object_t * object;
-	xmlDocPtr doc = NULL;
-	xmlNodePtr root_node = NULL,bnode;
-	doc = xmlNewDoc(BAD_CAST "1.0");
-	root_node = xmlNewNode(NULL,BAD_CAST *(user->user_name));
-	xmlDocSetRootElement(doc,root_node);
-	if(list_empty(&user->buckets)){
-		goto ret;
-	}
-	for_each_bucket(l,user){
-		bucket = container_of(l,bucket_t,b_list);
-		bnode = xmlNewChild(root_node,NULL,BAD_CAST *(bucket->bucket_name),BAD_CAST buf);
-		if(list_empty(&bucket->objects)){
-			continue;
-		}
-		for_each_object(x,bucket){
-			object = container_of(x,object_t,o_list);
-			xmlNewChild(bnode,NULL,BAD_CAST *(object->object_name),BAD_CAST buf);
-		}
-	}
-ret:
-	xmlSaveFormatFileEnc(xml_file,doc,"UTF-8",1);
-//	xmlSaveFormatFileEnc("-",doc,"UTF-8",1);
-	xmlFreeDoc(doc);
-	xmlCleanupParser();
-	xmlMemoryDump();
-	return 0;
-}
-#endif
+#include"nss.h"
+#include"xml.h"
 #define U1	"u1"
 #define U2	"u2"
 #define U3	"u3"
@@ -101,8 +64,6 @@ int main()
 	put_bucket(B3,U5);
 	put_bucket(B4,U5);
 	put_bucket(B5,U5);
-	get_user_dir_by_name(U5,(void**)&u,OP_WITH_LOCK);
-	prt_blist(u);
 	prt_bhash();
 	printf("----------------------\n");
 	if(put_object(O1,B3,U5) == 0){
@@ -126,11 +87,9 @@ int main()
 	if(put_object(O7,B3,U5) == 0){
 		printf("put o7 ok\n");
 	}
-	get_bucket_by_name(B3,u,(void**)&b,OP_WITH_LOCK);
-	prt_olist(b);
 	prt_ohash();
-	if(list_all_buckets_and_objects(u,"zz.xml") != 0){
-		fprintf(stderr,"xml fail!\n");
-	}
+	get_bucket(B3,U5,LIST_OBJECT_FILE);
+	get_user(U5,LIST_BUCKET_FILE,GU_LIST_BUCKETS);
+	get_user(U5,ALL_BUCKETS_OBJECTS_FILE,GU_LIST_ALL_BUCKETS_OBJECTS);
 	return 0;
 }

@@ -596,7 +596,7 @@ static int atomic_del_objects(bucket_t * bucket)
 	}
 	return 0;
 }
-int get_bucket(char * bucket_name,char * user_name)
+int get_bucket(char * bucket_name,char * user_name,char * xml_file)
 {
 	/* list all the objects in bucket */
 	/* do not use mutex */
@@ -619,21 +619,11 @@ int get_bucket(char * bucket_name,char * user_name)
 		goto ret;
 	}
 	b = (bucket_t*)ol;
-	printf("bucket --- %s\n",bucket_name);
-	if(list_empty(&b->objects)){
-		goto ret;
+	/* make a xml file which consists of all the objects of this bucket */
+	if(list_objects(b,xml_file) != 0){
+		fprintf(stderr,"list_objects fail!\n");
+		rt = 3;
 	}
-	if(pthread_mutex_lock(&b->mutex) != 0){
-		perror("lock bucket->mutex");
-		goto ret;
-	}
-	for_each_object(l,b){
-		o = container_of(l,object_t,o_list);
-		/* collect object info in xml format */
-		printf(" %s ",*(o->object_name));
-	}
-	printf("\n");
-	pthread_mutex_unlock(&b->mutex);
 ret:
 	return rt;
 }
@@ -760,7 +750,7 @@ static int atomic_del_buckets(user_dir_t * user)
 	}
 	return 0;
 }
-int get_user(char * user_name)
+int get_user(char * user_name,char * xml_file,char gu_flag)
 {
 	/* list bucket */
 	int rt = 0;
@@ -774,19 +764,10 @@ int get_user(char * user_name)
 		goto ret;
 	}
 	u = (user_dir_t*)bl;
-	if(list_empty(&u->buckets)){
-		goto ret;
-	}
-	if(pthread_mutex_lock(&u->mutex) != 0){
-		perror("get_user : pthread_mutex_lock u->mutex");
+	if(list_buckets_objects(u,xml_file,gu_flag) != 0){
+		fprintf(stderr,"list_buckets_objects fail!\n");
 		rt = 2;
-		goto ret;
 	}
-	for_each_bucket(l,u){
-		b = container_of(l,bucket_t,b_list);
-		printf("%s\n",*(b->bucket_name));
-	}
-	pthread_mutex_unlock(&u->mutex);
 ret:
 	return 0;
 }

@@ -84,15 +84,30 @@ typedef struct _user_object{
 #define U_HASH_MASK		(USER_HASH_NR - 1)
 #define B_HASH_MASK		(BKT_HASH_NR - 1)
 #define O_HASH_MASK		(OBJ_HASH_NR - 1)
-/*
-#define init_hash_mask(hm,hash_bits)	do{	\
-	int i;	\
-	hm = 0;	\
-	for(i=0;i<hash_bits;i++){	\
-		hm |= (1<<i);	\
-	}	\
-}while(0)
-*/
 #define OP_WITH_LOCK		00
 #define OP_WITHOUT_LOCK		01
+extern int init_name_space(void);
+extern int put_object(char * object_name,char * bucket_name,char * user_name);
+extern int get_object(char * object_name,char * bucket_name,char * user_name);
+extern int delete_object(char * object_name,char * bucket_name,char * user_name);
+
+extern int put_bucket(char * bucket_name,char * user_name);
+extern int get_bucket(char * bucket_name,char * user_name,char * xml_file);
+extern int delete_bucket(char * bucket_name,char * user_name);
+
+extern int put_user(char * user_name);
+extern int get_user(char * user_name,char * xml_file,char gu_flag);
+extern int delete_user(char * user_name);
+
+/* for debug */
+extern void prt_olist(bucket_t * bucket);
+extern void prt_blist(user_dir_t * user);
+extern void prt_ulist(void);
+extern void prt_uhash(void);
+extern void prt_bhash(void);
+extern void prt_ohash(void);
+#define GU_LIST_BUCKETS				00
+#define GU_LIST_ALL_BUCKETS_OBJECTS	01
+#define GU_FLAG_VALID(guf)	(guf == GU_LIST_ALL_BUCKETS_OBJECTS || \
+		guf == GU_LIST_BUCKETS)
 #endif

@@ -1,7 +1,11 @@
 #ifndef _XML_H
 #define _XML_H
-_PROTOTYPE(int xml_for_list_bucket,(user_dir_t * user));
-_PROTOTYPE(int xml_for_list_object,(bucket_t * bucket));
-_PROTOTYPE(int parse_bucket_xml,(char * xml_file));
-_PROTOTYPE(int parse_object_xml,(char * xml_file));
+#include"nss.h"
+#include<libxml/parser.h>
+#include<libxml/tree.h>
+#define ALL_BUCKETS_OBJECTS_FILE	"all.xml"
+#define LIST_BUCKET_FILE			"b.xml"
+#define LIST_OBJECT_FILE			"o.xml"
+extern int list_objects(bucket_t * bucket,char * xml_file);
+extern int list_buckets_objects(user_dir_t * user,char * xml_file,char gu_flag);
 #endif
