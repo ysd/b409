@@ -29,14 +29,15 @@ static inline file_node * prev_node_of_me(file_node * fn)
 	if(fn == NULL || fn->f_list.prev == file_node_list_head_ptr){
 		return NULL;
 	}
-	return file_node_of(fn->prev);
+	return file_node_of(fn->f_list.prev);
 }
 static void print_file_node_list(void)
 {
 	file_node * fn;
 	printf("-------------- file_node_list start -------------\n");
 	if(update != NULL){
-		printf("now updating file #%s\n",update->file_name);
+		fn = file_node_of(update);
+		printf("now updating file #%s\n",fn->file_name);
 	}
 	for_each_fn_in_fnlist(fn){
 		printf("fn->file_name\t#%s\n",fn->file_name);
