@@ -1,26 +1,35 @@
 #include"global.h"
 #include"md_type.h"
 #include"utility.h"
+#include"list_head.h"
 #define DBGMSG
 typedef struct _file_node{
 	char file_name[MAX_PATH];
-	struct _file_node * next;
-	struct _file_node * prev;
+	struct list_head f_list;
 }file_node;
 #define FN_SZ	sizeof(file_node)
 static pthread_mutex_t file_node_list_mutex = PTHREAD_MUTEX_INITIALIZER;	/* protect file_node_list */
 static pthread_mutex_t md_mutex = PTHREAD_MUTEX_INITIALIZER;				/* protect meta data & io_node list */
 static pthread_cond_t file_node_list_cond = PTHREAD_COND_INITIALIZER;		/* for update dtc file */
-static file_node * file_node_list_head;	/* head node */
-static file_node * update;				/* now updating */
-#define for_each_fn_in_fnlist(fn)		for(fn=file_node_list_head;fn!=NULL;fn=fn->next)
-#define FILE_NODE_LIST_NULL				(file_node_list_head == NULL)
+struct list_head file_node_list_head;
+static list_head * file_node_list_head_ptr;	
+static list_head * update;													/* now updating */
+#define for_each_file(l)			for(l=file_node_list_head_ptr->next;l!=file_node_list_head_ptr;l=l->next)
+#define FILE_NODE_LIST_NULL			list_empty(file_node_list_head_ptr)
+#define file_node_of(l)				container_of(l,file_node,f_list)
+static void init_fn_list(void)
+{
+	update = NULL;
+	file_node_list_head_ptr = &file_node_list_head;
+	list_head_init(file_node_list_head_ptr);
+	return;
+}
 static inline file_node * prev_node_of_me(file_node * fn)
 {
-	if(fn == NULL ){
+	if(fn == NULL || fn->f_list.prev == file_node_list_head_ptr){
 		return NULL;
 	}
-	return fn->prev;
+	return file_node_of(fn->prev);
 }
 static void print_file_node_list(void)
 {
@@ -33,12 +42,6 @@ static void print_file_node_list(void)
 		printf("fn->file_name\t#%s\n",fn->file_name);
 	}
 	printf("--------------- file_node_list end --------------\n");
-	return;
-}
-static void init_fn_list(void)
-{
-	update = NULL;
-	file_node_list_head = NULL;
 	return;
 }
 #define INIT_FILE_NODE(fn)	do{\
