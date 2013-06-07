@@ -89,12 +89,11 @@ static inline void simple_del_user_from_uht(user_dir_t * user)
 	list_del(&user->u_hash);
 	list_head_init(&user->u_hash);
 }
-static inline void get_absolute_path_of_object(object_t * object,char name_buf[])
+void get_absolute_path_of_object(object_t * object,char name_buf[])
 {
 	bzero(name_buf,MAX_PATH);
 	snprintf(name_buf,MAX_PATH,ABS_PATH_FMT,*(object->bucket->user_dir->user_name),\
 			*(object->bucket->bucket_name),*(object->object_name));
-	return;
 }
 static object_t * new_object(char * object_name,u16 uid,u16 gid,u16 acl,bucket_t * bucket)
 {

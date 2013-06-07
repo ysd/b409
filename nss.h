@@ -99,6 +99,8 @@ extern int put_user(char * user_name);
 extern int get_user(char * user_name,char * xml_file,char gu_flag);
 extern int delete_user(char * user_name);
 
+extern void get_absolute_path_of_object(object_t * object,char name_buf[]);
+
 /* for debug */
 extern void prt_olist(bucket_t * bucket);
 extern void prt_blist(user_dir_t * user);

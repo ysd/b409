@@ -2,6 +2,7 @@
 #include"nss.h"
 #include"list_head.h"
 #include"xml.h"
+#include"md_type.h"
 static char buf[16];
 int list_objects(bucket_t * bucket,char * xml_file)
 {
@@ -43,6 +44,9 @@ int list_buckets_objects(user_dir_t * user,char * xml_file,const char gu_flag)
 	object_t * object;
 	xmlDocPtr doc = NULL;
 	xmlNodePtr root_node = NULL,bnode;
+	Meta_Data md;
+	char full_path[MAX_PATH];
+	char md5[];
 	if(!(GU_FLAG_VALID(gu_flag))){
 		fprintf(stderr,"invalid get_user flag!\n");
 		return 1;
