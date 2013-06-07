@@ -242,7 +242,7 @@ static const unsigned char md5_padding[64] =
 /*
  * MD5 final digest
  */
-void md5_finish( md5_context *ctx, unsigned char output[16] )
+void md5_finish( md5_context *ctx, unsigned char output[MD5_CHECKSUM_SZ] )
 {
     unsigned long last, padn;
     unsigned long high, low;
@@ -270,7 +270,7 @@ void md5_finish( md5_context *ctx, unsigned char output[16] )
 /*
  * output = MD5( input buffer )
  */
-void md5( unsigned char *input, int ilen, unsigned char output[16] )
+void md5( unsigned char *input, int ilen, unsigned char output[MD5_CHECKSUM_SZ] )
 {
     md5_context ctx;
 
@@ -284,7 +284,7 @@ void md5( unsigned char *input, int ilen, unsigned char output[16] )
 /*
  * output = MD5( file contents )
  */
-int md5_file( char *path, unsigned char output[16] )
+int md5_file( char *path, unsigned char output[MD5_CHECKSUM_SZ] )
 {
     FILE *f;
     size_t n;
@@ -354,7 +354,7 @@ void md5_hmac_update( md5_context *ctx, unsigned char *input, int ilen )
 /*
  * MD5 HMAC final digest
  */
-void md5_hmac_finish( md5_context *ctx, unsigned char output[16] )
+void md5_hmac_finish( md5_context *ctx, unsigned char output[MD5_CHECKSUM_SZ] )
 {
     unsigned char tmpbuf[16];
 
@@ -371,7 +371,7 @@ void md5_hmac_finish( md5_context *ctx, unsigned char output[16] )
  * output = HMAC-MD5( hmac key, input buffer )
  */
 void md5_hmac( unsigned char *key, int keylen, unsigned char *input, int ilen,
-               unsigned char output[16] )
+               unsigned char output[MD5_CHECKSUM_SZ] )
 {
     md5_context ctx;
 
@@ -383,12 +383,12 @@ void md5_hmac( unsigned char *key, int keylen, unsigned char *input, int ilen,
 }
 
 //#if MD5_TEST
-void md5_2_str(unsigned char md5_checksum[16], char *md5_str)
+void md5_2_str(unsigned char md5_checksum[MD5_CHECKSUM_SZ], char *md5_str)
 {
 	static char *hex = "0123456789abcdef";
 	int i, j = 0;
 
-	for (i = 0; i < 16; i++) 
+	for (i = 0; i < MD5_CHECKSUM_SZ; i++) 
 	{
 		md5_str[j++] = hex[(0xf0 & md5_checksum[i]) >> 4];
 		md5_str[j++] = hex[0x0f & md5_checksum[i]];

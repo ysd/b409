@@ -3,6 +3,8 @@
  */
 #ifndef _MD5_H
 #define _MD5_H
+#define MD5_CHECKSUM_SZ	16
+#define MD5_STRING_LEN	33
 
 /**
  * \brief          MD5 context structure
@@ -44,7 +46,7 @@ void md5_update( md5_context *ctx, unsigned char *input, int ilen );
  * \param ctx      MD5 context
  * \param output   MD5 checksum result
  */
-void md5_finish( md5_context *ctx, unsigned char output[16] );
+void md5_finish( md5_context *ctx, unsigned char output[MD5_CHECKSUM_SZ] );
 
 /**
  * \brief          Output = MD5( input buffer )
@@ -53,7 +55,7 @@ void md5_finish( md5_context *ctx, unsigned char output[16] );
  * \param ilen     length of the input data
  * \param output   MD5 checksum result
  */
-void md5( unsigned char *input, int ilen, unsigned char output[16] );
+void md5( unsigned char *input, int ilen, unsigned char output[MD5_CHECKSUM_SZ] );
 
 /**
  * \brief          Output = MD5( file contents )
@@ -64,7 +66,7 @@ void md5( unsigned char *input, int ilen, unsigned char output[16] );
  * \return         0 if successful, 1 if fopen failed,
  *                 or 2 if fread failed
  */
-int md5_file( char *path, unsigned char output[16] );
+int md5_file( char *path, unsigned char output[MD5_CHECKSUM_SZ] );
 
 /**
  * \brief          MD5 HMAC context setup
@@ -90,7 +92,7 @@ void md5_hmac_update( md5_context *ctx, unsigned char *input, int ilen );
  * \param ctx      HMAC context
  * \param output   MD5 HMAC checksum result
  */
-void md5_hmac_finish( md5_context *ctx, unsigned char output[16] );
+void md5_hmac_finish( md5_context *ctx, unsigned char output[MD5_CHECKSUM_SZ] );
 
 /**
  * \brief          Output = HMAC-MD5( hmac key, input buffer )
@@ -103,9 +105,9 @@ void md5_hmac_finish( md5_context *ctx, unsigned char output[16] );
  */
 void md5_hmac( unsigned char *key, int keylen,
                unsigned char *input, int ilen,
-               unsigned char output[16] );
+               unsigned char output[MD5_CHECKSUM_SZ] );
 
-void md5_2_str(unsigned char md5_checksum[16], char *md5_str);
+void md5_2_str(unsigned char md5_checksum[MD5_CHECKSUM_SZ], char *md5_str);
 #ifdef __cplusplus
 }
 #endif

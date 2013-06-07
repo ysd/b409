@@ -38,3 +38,50 @@ int get_path_from_fd(int fd, char* path)
     snprintf(buf, 1024, "/proc/%i/fd/%i", pid, fd);
     return readlink(buf, path, MAX_PATH);
 }
+u32 atoi_u32(char *p)
+{
+	u32 i = 0;
+	u32 j;
+	char * ch = p;
+	while(*ch != 00){
+		if(*ch < '0' || *ch > '9'){
+			fprintf(stderr,"Invalid character found in u32 string!\n");
+			return -1;
+		}
+		j = (u32)(*ch - '0');
+		i = 10*i + j;
+		ch++;
+	}
+	return i;
+}
+u64 atoi_u64(char *p)
+{
+	u64 i = 0;
+	u64 j;
+	char * ch = p;
+	while(*ch != 00){
+		if(*ch < '0' || *ch > '9'){
+			fprintf(stderr,"Invalid character found in u64 string!\n");
+			return -1;
+		}
+		j = (u64)(*ch - '0');
+		i = 10*i + j;
+		ch++;
+	}
+	return i;
+}
+void u8_to_str(char ch,char *buf,u32 bufsiz)
+{
+	bzero(buf,bufsiz);
+	snprintf(buf,bufsiz,"%c",ch);
+}
+void u32_to_str(u32 i,char *buf,u32 bufsiz)
+{
+	bzero(buf,bufsiz);
+	snprintf(buf,bufsiz,"%u",i);
+}
+void u64_to_str(u64 i,char *buf,u32 bufsiz)
+{
+	bzero(buf,bufsiz);
+	snprintf(buf,bufsiz,"%llu",i);
+}
