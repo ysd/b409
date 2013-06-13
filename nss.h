@@ -14,9 +14,9 @@ enum{
 };
 #define SU_UID	0
 #define SU_GID	0
-#define O_R	0400
-#define O_W	0020
-#define O_X	0001
+#define O_R	04
+#define O_W	02
+#define O_X	01
 #define G_R	(O_R << 3)
 #define G_W	(O_W << 3)
 #define G_X	(O_X << 3)
@@ -100,6 +100,7 @@ extern int get_user(char * user_name,char * xml_file,char gu_flag);
 extern int delete_user(char * user_name);
 
 extern void get_absolute_path_of_object(object_t * object,char name_buf[]);
+extern void parse_path(char *full_path,char **user_name,char **bucket_name,char **obj_name);
 
 /* for debug */
 extern void prt_olist(bucket_t * bucket);
