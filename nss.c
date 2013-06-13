@@ -944,3 +944,31 @@ void prt_ohash(void)
 	printf("\n");
 	return;
 }
+void parse_path(char *full_name,char **user_name,char **bucket_name,char **obj_name)
+{
+
+    char *p=full_name;
+
+	while(*p=='/'){
+		p++;
+	}
+	*user_name = p;
+	while(*p!='/'){
+		p++;
+	}
+	*(p++) = '\0';
+
+	while(*p=='/'){
+		p++;
+	}
+	*bucket_name = p;
+	while(*p!='/'){
+		p++;
+	}
+	*(p++) = '\0';
+	while(*p=='/'){
+		p++;
+	}
+	*obj_name = p;
+	return 0;
+}
