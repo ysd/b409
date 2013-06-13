@@ -42,7 +42,7 @@
 static char fp[MAX_PATH];
 static int init_md_of_obj(char *u,char *b,char *o)
 {
-	Meta_Data md;
+	meta_data_t md;
 	char md5c[MD5_CHECKSUM_SZ];
 	char md5s[MD5_STRING_LEN];
 	int path_len;

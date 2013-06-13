@@ -1,20 +1,16 @@
 link_lib = -L/usr/local/lib -ltokyocabinet -lz -lbz2 -lrt -lpthread -lm -lc -lxml2
-objects = md_func.o utility.o posix_api.o
-obj_main = _creat.o _read.o _write.o _remove.o super_serv_process.o 
-.PHONY : all _creat _read _write _remove super_serv_process x
-all : _creat _read _write _remove super_serv_process 
-_creat : _creat.o $(objects)
-	gcc _creat.o $(objects) -g -o _creat $(link_lib)
-_read : _read.o $(objects)
-	gcc _read.o $(objects) -g -o _read $(link_lib)
-_write : _write.o $(objects)
-	gcc _write.o $(objects) -g -o _write $(link_lib)
-_remove : _remove.o $(objects)
-	gcc _remove.o $(objects) -g -o _remove $(link_lib)
-super_serv_process : super_serv_process.o $(objects)
-	gcc super_serv_process.o $(objects) -g -o super_serv_process $(link_lib) 
-x :
-	gcc -I/usr/include/libxml2 nss.c md5.c md_func.c utility.c name_buf.c namespace_server.c xml.c -o x $(link_lib)
+xml_include = -I/usr/include/libxml2
+objects = md_func.o utility.o nss.o md5.o name_buf.o xml.o
+obj_main = namespace_server.o
+all_bin = namespace
+.PHONY : all namespace
+all : namespace
+xml.o : 
+	gcc $(xml_include) -c xml.c
+namespace_server.o :
+	gcc $(xml_include) -c namespace_server.c
+namespace : namespace_server.o utility.o md_func.o md5.o name_buf.o xml.o nss.o
+	gcc namespace_server.o utility.o md_func.o md5.o name_buf.o xml.o nss.c -o namespace $(link_lib)
 .PHONY : clean
 clean :
-	rm _creat _read _write _remove super_serv_process $(objects) $(obj_main) 
+	rm $(all_bin) $(objects) $(obj_main) 

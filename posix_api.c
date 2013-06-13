@@ -5,7 +5,7 @@ static int init_file(char* path)
 {
 	/* initialize meta data for this file */
 	int rt = 0;
-	Meta_Data md;
+	meta_data_t md;
 	time_t t;
 	bzero(&md,MD_SZ);
 	t = time(NULL);
@@ -35,7 +35,7 @@ static int de_init_file(char *path)
 	int rt = 0;
 	int len;
 	char ionp[MAX_ION_PATH];
-	Meta_Data md;
+	meta_data_t md;
 	IO_Node ion;
 	if(md_get(path,&md) != 0){
 		rt = 1;

@@ -46,7 +46,7 @@ int list_buckets_objects(user_dir_t * user,char * xml_file,const char gu_flag)
 	object_t * object;
 	xmlDocPtr doc = NULL;
 	xmlNodePtr root_node = NULL,bnode,onode;
-	Meta_Data md;
+	meta_data_t md;
 	char full_path[MAX_PATH];
 	char md5c[MD5_CHECKSUM_SZ];
 	char md5s[MD5_STRING_LEN];

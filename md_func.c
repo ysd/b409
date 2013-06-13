@@ -6,12 +6,6 @@ static inline int get_db(tc_t type,char **db)
 		case MD:
 			*db = META_DATA_DB;
 			return MD_SZ;
-		case ION:
-			*db = IO_NODE_DB;
-			return ION_SZ;
-		case IOD:
-			*db = IO_DATA_DB;
-			return 0;
 		default:
 			fprintf(stderr,"unrecognized tc type!\n");
 			break;
@@ -99,7 +93,7 @@ ret:
 	tchdbdel(hdb);
 	return rt;
 }
-int md_get(char *path,Meta_Data * md)
+int md_get(char *path,meta_data_t * md)
 {
 	return tc_get((void*)path,(void*)md,MD);
 }
@@ -107,31 +101,7 @@ int md_out(char * path)
 {
 	return tc_out((void*)path,MD);
 }
-int md_put(char * path,Meta_Data * meta_data)
+int md_put(char * path,meta_data_t * meta_data)
 {
 	return tc_put((void*)path,(void*)meta_data,0,MD);
-}
-int ion_get(char *path_time,IO_Node *ion)
-{
-	return tc_get((void*)path_time,(void*)ion,ION);
-}
-int ion_out(char *path_time)
-{
-	return tc_out((void*)path_time,ION);
-}
-int ion_put(char *path_time,IO_Node *io_node)
-{
-	return tc_put((void*)path_time,(void*)io_node,0,ION);
-}
-int iod_get(char *path_time,void *iod)
-{
-	return tc_get((void*)path_time,iod,IOD);
-}
-int iod_out(char *path_time)
-{
-	return tc_out((void*)path_time,IOD);
-}
-int iod_put(char *path_time,void *iod,int len)
-{
-	return tc_put((void*)path_time,iod,len,IOD);
 }
