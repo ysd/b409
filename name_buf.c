@@ -214,6 +214,7 @@ unlock_and_ret:
 ret:
 	return;
 }
+#ifdef DBG_NAME_BUF
 /* for debug */
 void print_name_buf(name_buf * nb)
 {
@@ -242,7 +243,6 @@ void print_all_name_buf(void)
 	}
 	return;
 }
-/*
 #define ALLOC_ELEM	20
 #define BIGGGG		1000
 int main()
@@ -285,4 +285,4 @@ int main()
 	printf("i == %d\n",i);
 	return 0;
 }
-*/
+#endif
