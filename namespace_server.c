@@ -66,6 +66,7 @@ static int init_md_of_obj(char *u,char *b,char *o)
 }
 int main()
 {
+	int i;
 	user_dir_t * u;
 	bucket_t * b;
 	object_t * o;
