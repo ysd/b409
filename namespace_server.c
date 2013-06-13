@@ -1,4 +1,6 @@
 #include"global.h"
+#include"md_type.h"
+#include"md5.h"
 #include"utility.h"
 #include"list_head.h"
 #include"name_buf.h"
@@ -37,6 +39,26 @@
 #define O11	"o11"
 #define O12	"o12"
 #define O13	"o13"
+static char fp[MAX_PATH];
+static int init_md_of_obj(char *u,char *b,char *o)
+{
+	Meta_Data md;
+	char md5c[MD5_CHECKSUM_SZ];
+	char md5s[MD5_STRING_LEN];
+	int path_len;
+	bzero(fp,MAX_PATH);
+	snprintf(fp,MAX_PATH,ABS_PATH_FMT,u,b,o);
+	path_len = strlen(fp);
+	md5(fp,path_len,md5c);
+	bzero(md5s,MD5_STRING_LEN);
+	md5_2_str(md5c,md5s);
+	bzero(&md,MD_SZ);
+	strcpy(md.replica[0].rep_ip,"192.168.0.243");
+	if(md_put(md5s,&md) != 0){
+		return 1;
+	}
+	return 0;
+}
 int main()
 {
 	int i;
@@ -67,24 +89,31 @@ int main()
 	prt_bhash();
 	printf("----------------------\n");
 	if(put_object(O1,B3,U5) == 0){
+		init_md_of_obj(U5,B3,O1);
 		printf("put o1 ok\n");
 	}
 	if(put_object(O2,B3,U5) == 0){
+		init_md_of_obj(U5,B3,O2);
 		printf("put o2 ok\n");
 	}
 	if(put_object(O3,B3,U5) == 0){
+		init_md_of_obj(U5,B3,O3);
 		printf("put o3 ok\n");
 	}
 	if(put_object(O4,B3,U5) == 0){
+		init_md_of_obj(U5,B3,O4);
 		printf("put o4 ok\n");
 	}
 	if(put_object(O5,B3,U5) == 0){
+		init_md_of_obj(U5,B3,O5);
 		printf("put o5 ok\n");
 	}
 	if(put_object(O6,B3,U5) == 0){
+		init_md_of_obj(U5,B3,O6);
 		printf("put o6 ok\n");
 	}
 	if(put_object(O7,B3,U5) == 0){
+		init_md_of_obj(U5,B3,O7);
 		printf("put o7 ok\n");
 	}
 	prt_ohash();

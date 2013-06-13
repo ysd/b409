@@ -970,5 +970,5 @@ void parse_path(char *full_name,char **user_name,char **bucket_name,char **obj_n
 		p++;
 	}
 	*obj_name = p;
-	return 0;
+	return;
 }

@@ -92,15 +92,15 @@ int list_buckets_objects(user_dir_t * user,char * xml_file,const char gu_flag)
 			if(md_get(md5s,&md) != 0){
 				continue;
 			}
-			xmlNewChild(onode,NULL,BAD_CAST O_XML_HASH,BAD_CAST md5s);
-			u32_to_str(md.stat_info.st_atime,buf,BUFSIZ);
-			xmlNewChild(onode,NULL,BAD_CAST O_XML_ATIME,BAD_CAST buf);
-			u32_to_str(md.stat_info.st_mtime,buf,BUFSIZ);
-			xmlNewChild(onode,NULL,BAD_CAST O_XML_MTIME,BAD_CAST buf);
-			u32_to_str(md.stat_info.st_ctime,buf,BUFSIZ);
-			xmlNewChild(onode,NULL,BAD_CAST O_XML_CTIME,BAD_CAST buf);
-			u32_to_str(md.stat_info.st_size,buf,BUFSIZ);
-			xmlNewChild(onode,NULL,BAD_CAST O_XML_SIZE,BAD_CAST buf);
+		//	xmlNewChild(onode,NULL,BAD_CAST O_XML_HASH,BAD_CAST md5s);
+		//	u32_to_str(md.stat_info.st_atime,buf,BUFSIZ);
+		//	xmlNewChild(onode,NULL,BAD_CAST O_XML_ATIME,BAD_CAST buf);
+		//	u32_to_str(md.stat_info.st_mtime,buf,BUFSIZ);
+		//	xmlNewChild(onode,NULL,BAD_CAST O_XML_MTIME,BAD_CAST buf);
+		//	u32_to_str(md.stat_info.st_ctime,buf,BUFSIZ);
+		//	xmlNewChild(onode,NULL,BAD_CAST O_XML_CTIME,BAD_CAST buf);
+		//	u32_to_str(md.stat_info.st_size,buf,BUFSIZ);
+		//	xmlNewChild(onode,NULL,BAD_CAST O_XML_SIZE,BAD_CAST buf);
 			xmlNewChild(onode,NULL,BAD_CAST O_XML_IP,BAD_CAST md.replica[0].rep_ip);
 		}
 unlock_and_continue:
