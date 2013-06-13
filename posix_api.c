@@ -5,19 +5,14 @@ static int init_file(char* path)
 {
 	/* initialize meta data for this file */
 	int rt = 0;
-	char data_path[MAX_PATH];
-	struct stat my_stat;
 	Meta_Data md;
+	time_t t;
 	bzero(&md,MD_SZ);
-	get_data_path(path,data_path);
-	if(stat(data_path,&my_stat) != 0){
-		perror("stat");
-		rt = 1;
-		goto ret;
-	}
-	memcpy((void*)&(md.stat_info),(void*)&my_stat,sizeof(struct stat));
-	md.access_time_queue.head = 0;
-	md.access_time_queue.tail = 0;
+	t = time(NULL);
+	md.atime = t;
+	md.ctime = t;
+	md.mtime = t;
+	md.size = 0;
 	md.dirty = MD_CLEAN;
 	bzero(md.io_node_head,MAX_PATH);
 	bzero(md.io_node_tail,MAX_PATH);

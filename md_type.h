@@ -18,14 +18,11 @@ typedef struct{
 	char rep_ip[IP_LENGTH];
 }Replicas;
 typedef struct{
-    int head;
-    int tail;
-    time_t access_time[MAX_IO_ON_A_FILE];
-}IO_Queue;
-typedef struct{
-    struct stat stat_info;
+	time_t atime;
+	time_t ctime;
+	time_t mtime;
+	u64 size;
 	Replicas replica[REPLICA_NUM];
-	IO_Queue access_time_queue;       /* circular queue */
 	/* for update dtc file */
 	char dirty;
     char io_node_head[MAX_ION_PATH]; /* point to struct IO_Node */

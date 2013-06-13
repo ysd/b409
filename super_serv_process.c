@@ -283,11 +283,11 @@ static int que_out_modify_md(q_out_req *req)
 		prtion(&ion);
 		printf("ion with key #%s put\n",md.io_node_tail);
 #endif
-		md.stat_info.st_mtime = REQ_TIME(req);
+		md.mtime = REQ_TIME(req);
 		md.dirty = MD_DIRTY;
     }else if(REQ_IOT(req) == IO_READ){
 		/* just modify atime */
-		md.stat_info.st_atime = REQ_TIME(req);
+		md.atime = REQ_TIME(req);
 	}else{
 #ifdef DBGMSG
 		printf("unaccepted io_type!\n");
@@ -466,7 +466,7 @@ static void flush2data_center(void)
 #ifdef DBGMSG
 			printf("ion_get success!\n");
 			prtion(&ion);
-			printf("md->stat_info.st_mtime\t#%d\n",md.stat_info.st_mtime);
+			printf("md->mtime\t#%d\n",md.mtime);
 #endif
 
 			if(ion.length > 0){
