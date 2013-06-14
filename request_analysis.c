@@ -1,11 +1,10 @@
 #include "request_analysis.h"
 #include "container.h"
 #include "object_response_header.h"
-#include "xml.h"
 #include "bucket_response_header.h"
-#include "posix_for_s3.h"
 #include "utility.h"
-
+#include "xml.h"
+#include "xml_s3.h"
 unsigned int nr_of_uploading_clients=0; 
 int
 request_get(void *cls, struct MHD_Connection *connection,          

@@ -1,6 +1,8 @@
 /* my own error message reporter 
  * compile this file to a shared object */
-#include"glob.h"
+#include "global.h"
+#include "errmsg.h"
+#include <stdarg.h>
 u8 err_msg[ERR_MSG_LEN];
 void perrmsg(u8 * msg)
 {

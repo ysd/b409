@@ -1,5 +1,6 @@
 #include "delete_bucket.h"
-
+#include "xml.h"
+#include "xml_s3.h"
 
 
 

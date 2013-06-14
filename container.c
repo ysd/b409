@@ -1,9 +1,10 @@
 #include "container.h"
 #include "request_analysis.h"
-#include "xml.h"
-#include "glob.h"
+#include "global.h"
 #include "md_type.h"
-#include "io_queue.h"
+#include "xml.h"
+#include "xml_s3.h"
+#include"nss.h"
 
 #define PORT 8888
 /*
@@ -151,6 +152,7 @@ int main ()
   //SimpleLog_Setup(NULL, "%H:%M:%S", 0, 1, 0, "\t");
   //printf("%s New %s request for %s using version %s",__func__, method, url, version);
   struct MHD_Daemon *daemon;
+  init_name_space();
  // unsigned int nr_of_uploading_clients=0;
   daemon = MHD_start_daemon (MHD_USE_THREAD_PER_CONNECTION, PORT, NULL, NULL,
                              &answer_to_connection, NULL, MHD_OPTION_NOTIFY_COMPLETED,

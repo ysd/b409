@@ -3,8 +3,8 @@
 #define _PROTOTYPE(function,params)		extern function()
 #define MAX_PATH 260
 #define MAX_ION_PATH 260
-#define CACHE_PATH		"/mnt/cache/"
-#define DATA_PATH		"/mnt/data_center/"
+#define CACHE_PATH		"/mnt/supercache/"
+#define DATA_PATH		"/mnt/datacenter/"
 
 #define FIELD_OF(p,f)	((p)->f)
 #define offsetof(member,type)		((u32) &((type*)0)->member)
@@ -47,4 +47,3 @@ typedef struct{
 }q_out_req;
 #define QOUT_REQ_SZ		sizeof(q_out_req)
 #endif
-

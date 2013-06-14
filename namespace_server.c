@@ -40,30 +40,6 @@
 #define O12	"o12"
 #define O13	"o13"
 static char fp[MAX_PATH];
-static int init_md_of_obj(char *u,char *b,char *o)
-{
-	Meta_Data md;
-	char md5c[MD5_CHECKSUM_SZ];
-	char md5s[MD5_STRING_LEN];
-	int path_len;
-	time_t t = time(NULL);
-	bzero(fp,MAX_PATH);
-	snprintf(fp,MAX_PATH,ABS_PATH_FMT,u,b,o);
-	path_len = strlen(fp);
-	md5(fp,path_len,md5c);
-	bzero(md5s,MD5_STRING_LEN);
-	md5_2_str(md5c,md5s);
-	bzero(&md,MD_SZ);
-	md.atime = t;
-	md.ctime = t;
-	md.mtime = t;
-	md.size = 1024;
-	strcpy(md.replica[0].rep_ip,"192.168.0.243");
-	if(md_put(md5s,&md) != 0){
-		return 1;
-	}
-	return 0;
-}
 int main()
 {
 	int i;

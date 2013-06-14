@@ -1,6 +1,8 @@
 #include "bucket_response_header.h"
 #include "container.h"
 #include "object_response_header.h"
+#include "xml.h"
+#include "xml_s3.h"
 /*
 int get_bucket_header_yes(struct MHD_Response *response,struct sender_head send_header)
 {

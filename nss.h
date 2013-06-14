@@ -103,6 +103,7 @@ extern void get_absolute_path_of_object(object_t * object,char name_buf[]);
 extern void parse_path(char *full_path,char **user_name,char **bucket_name,char **obj_name);
 
 /* for debug */
+extern int init_md_of_obj(char *u,char *b,char *o);
 extern void prt_olist(bucket_t * bucket);
 extern void prt_blist(user_dir_t * user);
 extern void prt_ulist(void);
