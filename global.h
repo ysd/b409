@@ -29,6 +29,7 @@
 #include<sys/socket.h>
 #include<netinet/in.h>
 #include<arpa/inet.h>
+#include<stdarg.h>
 typedef uint8_t   u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
