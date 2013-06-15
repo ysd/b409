@@ -2,9 +2,10 @@
 #define _HASH_H
 #include"global.h"
 
-/* hash_func_t is pointer to the hash function */
-typedef u32 (*hash_func_t)(char*);
-#define HASH_FUNC_T_SZ sizeof(hash_func_t)
+
+/* hashfunc_t is pointer to the hash function */
+typedef u32 (*hashfunc_t)(char*);
+#define HASH_FUNC_T_SZ sizeof(hashfunc_t)
 
 /* A Simple Hash Function */
 extern u32 simple_hash(char *str);

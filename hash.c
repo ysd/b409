@@ -167,3 +167,5 @@ u32 CRC_hash(char *str)
 
 	return (answer & 0xFFFFFFFF);
 }
+
+
