@@ -973,19 +973,10 @@ void parse_path(char *full_name,char **user_name,char **bucket_name,char **obj_n
 	*obj_name = p;
 	return;
 }
-int init_md_of_obj(char *u,char *b,char *o)
+int init_md_of_obj(char *md5s)
 {
 	Meta_Data md;
-	char md5c[MD5_CHECKSUM_SZ];
-	char md5s[MD5_STRING_LEN];
-	int path_len;
 	time_t t = time(NULL);
-	bzero(fp,MAX_PATH);
-	snprintf(fp,MAX_PATH,ABS_PATH_FMT,u,b,o);
-	path_len = strlen(fp);
-	md5(fp,path_len,md5c);
-	bzero(md5s,MD5_STRING_LEN);
-	md5_2_str(md5c,md5s);
 	bzero(&md,MD_SZ);
 	md.atime = t;
 	md.ctime = t;
