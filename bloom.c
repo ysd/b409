@@ -108,14 +108,10 @@ int bloom_op(bloom_filter_t *bloom,char *md5,const u8 flag)
 /*  1) >=0 is returned on success
 	and the return value is the bytes truely written to cache
  * 2) -1 is returned on failure */
-int dedup(bloom_filter_t *bloom,u8 * buf,u32 buflen)
+int dedup(bloom_filter_t *bloom,char * md5s,u8 * buf,int buflen)
 {
 	int i,fd;
 	char blk_cache_path[MAX_PATH];
-	u8 md5c[MD5_CHECKSUM_SZ],md5s[MD5_STRING_LEN];
-	md5(buf,buflen,md5c);
-	bzero(md5s,MD5_STRING_LEN);
-	md5_2_str(md5c,md5s);
 	i = bloom_op(bloom,md5s,BLOOM_INC);
 	if(i == -1){
 		fprintf(stderr,"BLOOM_INC fail!\n");

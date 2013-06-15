@@ -382,7 +382,6 @@ void md5_hmac( unsigned char *key, int keylen, unsigned char *input, int ilen,
     memset( &ctx, 0, sizeof( md5_context ) );
 }
 
-//#if MD5_TEST
 void md5_2_str(unsigned char md5_checksum[MD5_CHECKSUM_SZ], char *md5_str)
 {
 	static char *hex = "0123456789abcdef";
@@ -396,15 +395,10 @@ void md5_2_str(unsigned char md5_checksum[MD5_CHECKSUM_SZ], char *md5_str)
 	md5_str[j] = '\0';
 }
 
-/*int
-main (int argc, char *argv[])
+void md5s_of_str(unsigned char * input,int len, char *md5s)
 {
-	unsigned char md5_checksum[16 + 1] = {0};
-	unsigned char md5_str[33] = {0};
-	
-	md5_file(argv[1], md5_checksum);
-	md5_2_str(md5_checksum, md5_str);
-	printf("%s  %s\n", md5_str, argv[1]);
+	unsigned char md5_checksum[MD5_CHECKSUM_SZ] = {0};
+	md5(input,len, md5_checksum);
+	bzero(md5s,MD5_STRING_LEN);
+	md5_2_str(md5_checksum, md5s);
 }
-*/
-//#endif

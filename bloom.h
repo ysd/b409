@@ -30,6 +30,6 @@ extern void bloom_destroy(bloom_filter_t * bloom);
 extern int bloom_op(bloom_filter_t *bloom,char * md5,u8 b_flag);
 
 #define FIX_BLK_SZ	(4*_1K)
-extern int dedup(bloom_filter_t *bloom,u8 * buf,u32 buflen);
+extern int dedup(bloom_filter_t *bloom,char * md5s,u8 * buf,int buflen);
 extern void show_bloom_info(bloom_filter_t * bloom);
 #endif

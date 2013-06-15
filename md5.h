@@ -108,6 +108,9 @@ void md5_hmac( unsigned char *key, int keylen,
                unsigned char output[MD5_CHECKSUM_SZ] );
 
 void md5_2_str(unsigned char md5_checksum[MD5_CHECKSUM_SZ], char *md5_str);
+
+void md5s_of_str(unsigned char * input,int len, char *md5s);
+
 #ifdef __cplusplus
 }
 #endif
