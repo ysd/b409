@@ -2,15 +2,19 @@
 #include"bloom.h"
 #include"md5.h"
 #include"blk_idx.h"
-#define _FILE_NAME	"/home/libxml2-2.7.8.tar.gz"
-int main()
+int main(int argc , char * argv[])
 {
 	struct stat st;
 	u64 bytes_cached = 0;
 	int fd,buflen,dedup_rt,ifd;
 	index_entry_t idxe;
 	u64 block_nr = 0;
-	char buf[FIX_BLK_SZ],md5s[MD5_STRING_LEN],index_file_name[MAX_PATH];
+	char buf[FIX_BLK_SZ],md5s[MD5_STRING_LEN],index_file_name[MAX_PATH],*_FILE_NAME;
+	if(argc != 2){
+		fprintf(stderr,"invalid arguments!\n");
+		return 1;
+	}
+	_FILE_NAME = argv[1];
 	/* initialize index file */
 	md5s_of_str(_FILE_NAME,strlen(_FILE_NAME),md5s);
 	get_index_file_name(md5s,index_file_name);
@@ -53,14 +57,14 @@ int main()
 		bzero(buf,FIX_BLK_SZ);
 	}
 	printf("--------- block_nr #%ld\n",block_nr);
-	/* before close index file,read it to see if the index entry is put into file correctly */
-	block_nr=0;
-	bzero(&idxe,BLOCK_INDEX_ENTRY_SZ);
-	lseek(ifd,0,SEEK_SET);
-	while(read(ifd,&idxe,BLOCK_INDEX_ENTRY_SZ) == BLOCK_INDEX_ENTRY_SZ){
-		prt_idxe(&idxe);
-		bzero(&idxe,BLOCK_INDEX_ENTRY_SZ);
-	}
+//	/* before close index file,read it to see if the index entry is put into file correctly */
+//	block_nr=0;
+//	bzero(&idxe,BLOCK_INDEX_ENTRY_SZ);
+//	lseek(ifd,0,SEEK_SET);
+//	while(read(ifd,&idxe,BLOCK_INDEX_ENTRY_SZ) == BLOCK_INDEX_ENTRY_SZ){
+//		prt_idxe(&idxe);
+//		bzero(&idxe,BLOCK_INDEX_ENTRY_SZ);
+//	}
 	close(ifd);
 	printf("bytes actually cached -- #%ld\n",bytes_cached);
 	show_bloom_info(bloom);
