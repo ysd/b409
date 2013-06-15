@@ -1,5 +1,8 @@
 #ifndef _GLB_H
 #define _GLB_H
+#define _1K	(1 << 10)
+#define _1M	(1 << 20)
+#define _1G	(1 << 30)
 #define _PROTOTYPE(function,params)		extern function()
 #define MAX_PATH 260
 #define MAX_ION_PATH 260
