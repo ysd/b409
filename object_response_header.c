@@ -1541,6 +1541,7 @@ int send_page (struct MHD_Connection *connection, const char *page,
 	//printf("+++++++++++++++++++++++++++++++++++++++++++++%s\n",command);
 	system(command);
 	put_object(object,bucket,user);
+	init_md_of_obj(hash_pathname);
 	//printf("+++++++++++++++++++++++++++++++++++++++++%s\n",from_path);
 	//printf("+++++++++++++++++++++++++++++++++++++++++%s\n",to_path);
 	return ret;
