@@ -2,7 +2,7 @@
 #include"bloom.h"
 #include"md5.h"
 #include"blk_idx.h"
-#define _FILE_NAME	"/home/libxml2-2.7.8.tar.gz"
+#define _FILE_NAME	"/home/grant/Downloads/nc"
 int main()
 {
 	struct stat st;
