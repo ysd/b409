@@ -11,20 +11,16 @@ typedef enum{
 #define REPLICA_NUM	3
 #define IP_LENGTH	INET_ADDRSTRLEN
 
-#define MD_FLAG_CACGE_DIRTY	0x10
-#define MD_FLAG_CACHE_CLEAN	00
-#define MD_FLAG_IN_CACHE	01
-#define MD_FLAG_IN_DATACT	00
-#define is_in_cache(md)	((md)->md_flag & MD_FLAG_IN_CACHE)
-#define set_in_data_center(md)		do{	\
-	typeof(md) _md = md;	\
-	_md->md_flag = 0;	\
-}while(0)
-#define set_in_cache(md)			do{	\
-	typeof(md) _md = md;	\
-	_md->md_flag = 0;	\
-	_md->md_flag |= MD_FLAG_IN_CACHE;	\
-}while(0)
+#define MD_FLAG_IN_CACHE	0x1
+#define MD_FLAG_CACHE_DIRTY	0x10
+#define is_in_cache(md)				((md)->flag & MD_FLAG_IN_CACHE)
+#define is_in_cache_and_dirty(md)	(is_in_cache(md) && \
+		((md)->flag & MD_FLAG_CACHE_DIRTY))
+#define set_cache_bit(md)	(md)->flag |= MD_FLAG_IN_CACHE
+#define clear_cache_bit(md)	(md)->flag &= ~MD_FLAG_IN_CACHE
+/* dirty bit is valid only when cache bit is set */
+#define set_cache_dirty(md)	(md)->flag |= MD_FLAG_CACHE_DIRTY
+#define set_cache_clean(md)	(md)->flag &= ~MD_FLAG_CACHE_DIRTY
 typedef struct{
 	char rep_ip[IP_LENGTH];
 }Replicas;
@@ -34,10 +30,12 @@ typedef struct{
 	time_t atime;
 	time_t ctime;
 	time_t mtime;
-	char md_flag;
+	char flag;
 }meta_data_t;
 #define MD_SZ	sizeof(meta_data_t)
-_PROTOTYPE(int md_get,(char *path,meta_data_t *md));
-_PROTOTYPE(int md_put,(char *path,meta_data_t *md));
-_PROTOTYPE(int md_out,(char *path));
+extern int md_get(char *path,meta_data_t *md);
+extern int md_put(char *path,meta_data_t *md);
+extern int md_out(char *path);
+extern int init_md_of_obj(char *md5s);
+extern int de_init_md_of_obj(char *md5s);
 #endif

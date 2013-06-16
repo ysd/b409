@@ -39,28 +39,8 @@
 #define O11	"o11"
 #define O12	"o12"
 #define O13	"o13"
+static char md5s[MD5_STRING_LEN];
 static char fp[MAX_PATH];
-static int init_md_of_obj(char *u,char *b,char *o)
-{
-	meta_data_t md;
-	char md5s[MD5_STRING_LEN];
-	int path_len;
-	time_t t = time(NULL);
-	bzero(fp,MAX_PATH);
-	snprintf(fp,MAX_PATH,ABS_PATH_FMT,u,b,o);
-	path_len = strlen(fp);
-	md5s_of_str(fp,md5s);
-	bzero(&md,MD_SZ);
-	md.atime = t;
-	md.ctime = t;
-	md.mtime = t;
-	md.size = 1024;
-	strcpy(md.replica[0].rep_ip,"192.168.0.243");
-	if(md_put(md5s,&md) != 0){
-		return 1;
-	}
-	return 0;
-}
 int main()
 {
 	user_dir_t * u;
@@ -89,32 +69,60 @@ int main()
 	put_bucket(B5,U5);
 	prt_bhash();
 	printf("----------------------\n");
+
+
 	if(put_object(O1,B3,U5) == 0){
-		init_md_of_obj(U5,B3,O1);
+		bzero(fp,MAX_PATH);
+		snprintf(fp,MAX_PATH,ABS_PATH_FMT,U5,B3,O1);
+		md5s_of_str(fp,strlen(fp),md5s);
+		init_md_of_obj(md5s);
 		printf("put o1 ok\n");
 	}
 	if(put_object(O2,B3,U5) == 0){
-		init_md_of_obj(U5,B3,O2);
+		bzero(fp,MAX_PATH);
+		snprintf(fp,MAX_PATH,ABS_PATH_FMT,U5,B3,O2);
+		md5s_of_str(fp,strlen(fp),md5s);
+		init_md_of_obj(md5s);
 		printf("put o2 ok\n");
 	}
 	if(put_object(O3,B3,U5) == 0){
-		init_md_of_obj(U5,B3,O3);
+		bzero(fp,MAX_PATH);
+		snprintf(fp,MAX_PATH,ABS_PATH_FMT,U5,B3,O3);
+		md5s_of_str(fp,strlen(fp),md5s);
+		init_md_of_obj(md5s);
+		printf("put o2 ok\n");
 		printf("put o3 ok\n");
 	}
 	if(put_object(O4,B3,U5) == 0){
-		init_md_of_obj(U5,B3,O4);
+		bzero(fp,MAX_PATH);
+		snprintf(fp,MAX_PATH,ABS_PATH_FMT,U5,B3,O4);
+		md5s_of_str(fp,strlen(fp),md5s);
+		init_md_of_obj(md5s);
+		printf("put o2 ok\n");
 		printf("put o4 ok\n");
 	}
 	if(put_object(O5,B3,U5) == 0){
-		init_md_of_obj(U5,B3,O5);
+		bzero(fp,MAX_PATH);
+		snprintf(fp,MAX_PATH,ABS_PATH_FMT,U5,B3,O5);
+		md5s_of_str(fp,strlen(fp),md5s);
+		init_md_of_obj(md5s);
+		printf("put o2 ok\n");
 		printf("put o5 ok\n");
 	}
 	if(put_object(O6,B3,U5) == 0){
-		init_md_of_obj(U5,B3,O6);
+		bzero(fp,MAX_PATH);
+		snprintf(fp,MAX_PATH,ABS_PATH_FMT,U5,B3,O6);
+		md5s_of_str(fp,strlen(fp),md5s);
+		init_md_of_obj(md5s);
+		printf("put o2 ok\n");
 		printf("put o6 ok\n");
 	}
 	if(put_object(O7,B3,U5) == 0){
-		init_md_of_obj(U5,B3,O7);
+		bzero(fp,MAX_PATH);
+		snprintf(fp,MAX_PATH,ABS_PATH_FMT,U5,B3,O7);
+		md5s_of_str(fp,strlen(fp),md5s);
+		init_md_of_obj(md5s);
+		printf("put o2 ok\n");
 		printf("put o7 ok\n");
 	}
 	prt_ohash();

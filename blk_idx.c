@@ -1,5 +1,6 @@
 #include"global.h"
 #include"blk_idx.h"
+
 /* fp is the finger print of the file name
  * a index file will be created
  * 0 is returned in success

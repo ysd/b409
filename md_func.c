@@ -105,3 +105,23 @@ int md_put(char * path,meta_data_t * meta_data)
 {
 	return tc_put((void*)path,(void*)meta_data,0,MD);
 }
+/* initialize the meta data for object 
+ * @md5s : md5 of object full path from namespce */
+int init_md_of_obj(char * md5s)
+{
+	meta_data_t md;
+	time_t t = time(NULL);
+	bzero(&md,MD_SZ);
+	md.atime = t;
+	md.ctime = t;
+	md.mtime = t;
+	md.size = 0;
+	/* originally not in cache */
+	clear_cache_bit(&md);
+	strcpy(md.replica[0].rep_ip,"192.168.0.244");
+	return md_put(md5s,&md); 
+}
+int de_init_md_of_obj(char *md5s)
+{
+	return md_out(md5s);
+}

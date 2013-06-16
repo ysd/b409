@@ -50,5 +50,14 @@ typedef struct{
 	u32 length;
 }q_out_req;
 #define QOUT_REQ_SZ		sizeof(q_out_req)
+#define zmax(a,b)	do{	\
+	typeof((a)) _a = (a);	\
+	typeof((b)) _b = (b);	\
+	(_a>=_b?_a:_b);	\
+}while(0)
+#define zmin(a,b)	do{	\
+	typeof((a)) _a = (a);	\
+	typeof((b)) _b = (b);	\
+	(_a<=_b?_a:_b);	\
+}while(0)
 #endif
-
