@@ -33,11 +33,18 @@
 #include<netinet/in.h>
 #include<arpa/inet.h>
 #include<stdarg.h>
+/* include for redis */
+#include<hiredis/hiredis.h>
 typedef uint8_t   u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
 typedef uint64_t u64;
 /* socket */
+
+/* socket for redis */
+#define REDIS_IP	"127.0.0.1"
+#define REDIS_PORT	6379
+
 #define Q_OUT_SERV_PORT 9374
 #define SERV_IP "127.0.0.1"
 #define LISTENQ 128
