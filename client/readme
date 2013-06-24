@@ -1,0 +1,29 @@
+compile command: gcc -I/usr/local/project/fileTrans/client -o client client.c command.c input.c
+
+//connect 127.0.0.1 (this command shold run first,127.0.0.1 should change be the server ip,the port is 8000 )
+
+（1）客户端运行之后，首先登录，然后获取目录树
+login [userName] [password] eg: login u5 u5 //登录
+xmlget //获取目录树
+
+（2）然后可以进行以下操作
+//列出用户拥有的所有buckets和objects
+list all   
+
+//列出用户拥有的所有buckets
+listbuckets
+
+//列出用户某个bucket下的所有objects 
+listobjects [bucketName]   eg：listobjects b5
+
+//下载指定bucket下的指定object
+getobject [objectName] [bucketName] eg: getobject o3 b5
+
+//将指定的文件以指定的object名上传到指定的bucket下
+putobject  [objectName] [bucketName] eg：putobject o1 b3
+
+
+其他命令
+get /usr/local/a.txt /usr/ ( put local file /usr/local/a.txt to server folder /usr/, the name is a.txt)
+put /usr/local/a.txt /usr/ ( get server file /usr/local/a.txt to local folder /usr/, the name is a.txt)
+bye  (disconnect)
