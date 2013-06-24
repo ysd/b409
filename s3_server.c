@@ -1,4 +1,4 @@
-#include "container.h"
+#include "s3_server.h"
 #include "request_analysis.h"
 #include "global.h"
 #include "md_type.h"
@@ -153,6 +153,11 @@ int main ()
   //printf("%s New %s request for %s using version %s",__func__, method, url, version);
   struct MHD_Daemon *daemon;
   init_name_space();
+  put_user("u1");
+  put_user("u2");
+  put_user("u3");
+  put_user("u4");
+  put_user("u5");
  // unsigned int nr_of_uploading_clients=0;
   daemon = MHD_start_daemon (MHD_USE_THREAD_PER_CONNECTION, PORT, NULL, NULL,
                              &answer_to_connection, NULL, MHD_OPTION_NOTIFY_COMPLETED,

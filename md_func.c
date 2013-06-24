@@ -37,7 +37,7 @@ static int tc_get(void * key,void * value,tc_t type)
 	v = tchdbget(hdb,key,ksz,&vsz);
 	if(!value){
 		ecode = tchdbecode(hdb);
-		fprintf(stderr,"(key=%s) md_get error:%s\n",key,tchdberrmsg(ecode));
+		fprintf(stderr,"(key=%s) md_get error:%s\n",(char*)key,tchdberrmsg(ecode));
 		rt = 2;
 		goto ret;
 	}
@@ -65,7 +65,7 @@ static int tc_out(void * key,tc_t type)
 	}
 	if(!tchdbout(hdb,key,ksz)){
 		ecode = tchdbecode(hdb);
-		fprintf(stderr,"(key=%s) tc_out error:%s\n",key,tchdberrmsg(ecode));
+		fprintf(stderr,"(key=%s) tc_out error:%s\n",(char *)key,tchdberrmsg(ecode));
 		rt = 2;
 	}
 ret:
@@ -92,7 +92,7 @@ static int tc_put(void * key,void * value,int len,tc_t type)
 	}
 	if(!tchdbput(hdb,key,ksz,value,vsz)){
 		ecode = tchdbecode(hdb);
-		fprintf(stderr,"(key=%s) tc_put error:%s\n",key,tchdberrmsg(ecode));
+		fprintf(stderr,"(key=%s) tc_put error:%s\n",(char *)key,tchdberrmsg(ecode));
 		rt = 2;
 	}
 ret:

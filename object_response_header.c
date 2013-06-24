@@ -1,10 +1,11 @@
 #include "object_response_header.h"
 #include "request_analysis.h"
-#include "container.h"
+#include "s3_server.h"
 #include "utility.h"
 #include "xml.h"
 #include "xml_s3.h"
-#include"nss.h"
+#include "nss.h"
+#include "nss_msg.h"
 int get_object_header_yes(struct MHD_Response *response,struct sender_head send_header)
 {
 
@@ -1538,18 +1539,18 @@ int send_page (struct MHD_Connection *connection, const char *page,
 	sprintf(to_path,"/mnt/supercache/%s",hash_pathname);
 	char command[256];
 	sprintf(command,"mv %s %s",from_path,to_path);
-	//printf("+++++++++++++++++++++++++++++++++++++++++++++%s\n",command);
 	system(command);
-	put_object(object,bucket,user);
+	//put_user(user);
+	//put_bucket(bucket,user);
+	int fd;
+	connect_to_nss_server(&fd);
+	put_object_msg_client(fd,object,bucket,user);
 	init_md_of_obj(hash_pathname);
-	//printf("+++++++++++++++++++++++++++++++++++++++++%s\n",from_path);
-	//printf("+++++++++++++++++++++++++++++++++++++++++%s\n",to_path);
 	return ret;
 }
 
 
-	int
-iterate_post (void *coninfo_cls, enum MHD_ValueKind kind, const char *key,
+int iterate_post (void *coninfo_cls, enum MHD_ValueKind kind, const char *key,
 		const char *filename, const char *content_type,
 		const char *transfer_encoding, const char *data, uint64_t off,
 		size_t size)
@@ -1560,61 +1561,32 @@ iterate_post (void *coninfo_cls, enum MHD_ValueKind kind, const char *key,
 	//	printf("now in iterate_post!\n");
 	//	printf("the data is : %s\n",data);
 	//printf("the data size is %d \n",size);
-
-	//********************************20130515***************************
-
-
-	// printf("IP of client is : %s\n",con_info->client_ip);
-	//return MHD_NO;
-
 	//********************************20130515*****************************
-
 	con_info->answerstring = servererrorpage;
+	printf("the url  in  iterate_post is %s \n",con_info->url);
 	con_info->answercode = MHD_HTTP_INTERNAL_SERVER_ERROR;
-	//$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-	//**************************************** 20130602****************************
-	//    *************************************20130603*************************
-	//    printf("filename  is  &&&  %s \n",filename);
-	//
-	//
-	//    **********************************20130608***********************
-
-	/*
-
-	   if (0 != strcmp (key, "file"))
-	   {
-	   printf(" key is not file! quit out! \n");
-	   return MHD_NO;
-	   }
-
-
-	 */
 	//********************************20130608******************************
+	unsigned char hash_pathname[33]={0};
+	unsigned char md5sum[16]={0};
+	int path_len=strlen(con_info->url);
+	md5(con_info->url,path_len,md5sum);
+	md5_2_str(md5sum,hash_pathname);
 	char temp_filename[256];
-	sprintf(temp_filename,"%s.%s",filename,con_info->client_ip);
+	sprintf(temp_filename,"%s.%s",hash_pathname,con_info->client_ip);
 	//printf("@#@#@#@#@#@#@@##@#@#@#@#@#@#@#@@#@##%s\n",temp_filename);
 	char pathname[256];
 	get_cache_path(temp_filename,pathname);
 
-	//printf("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$%d\n",getpid());
-	//time_t arrive_time;
-	//time(&arrive_time);
-	//IO_Type io_type=WRITE;
 	if (!con_info->fp)
 	{
-		if (NULL != (fp = fopen (filename, "rb")))
+		/*
+		if (NULL != (fp = fopen (pathname, "rb")))
 		{
 			fclose (fp);
 			con_info->answerstring = fileexistspage;
 			con_info->answercode = MHD_HTTP_FORBIDDEN;
 			return MHD_NO;
-		}
-
-		// con_info->fp = fopen (filename, "ab");
-		/**************************add by Jin************/
-
-		// queue_in_wait(pathname,io_type,arrive_time);
-		/**********************************************/
+		}*/
 		con_info->fp = fopen (pathname, "wb");
 		if (!con_info->fp)
 			return MHD_NO;

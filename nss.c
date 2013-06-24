@@ -769,7 +769,8 @@ int get_user(char * user_name,char * xml_file,char gu_flag)
 		rt = 2;
 	}
 ret:
-	return 0;
+//	return 0;
+	return rt;
 }
 int put_user(char * user_name)
 {
@@ -982,7 +983,7 @@ int init_md_of_obj(char *md5s)
 	md.ctime = t;
 	md.mtime = t;
 	md.size = 1024;
-	strcpy(md.replica[0].rep_ip,"192.168.0.243");
+	strcpy(md.replica[0].rep_ip,"192.168.0.244");
 	if(md_put(md5s,&md) != 0){
 		return 1;
 	}

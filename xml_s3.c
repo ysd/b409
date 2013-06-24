@@ -1,32 +1,30 @@
 #include "xml_s3.h"
 
-
-bool is_dir_xml(const char *path)
+bool is_dir_xml(const char* path)
 {
     struct stat statbuf;
-    if(lstat(path, &statbuf) ==0)//lstat·µ»ØÎÄŒþµÄÐÅÏ¢£¬ÎÄŒþÐÅÏ¢Žæ·ÅÔÚstatœá¹¹ÖÐ
+    if(lstat(path, &statbuf) ==0)
     {
-        return S_ISDIR(statbuf.st_mode) != 0;//S_ISDIRºê£¬ÅÐ¶ÏÎÄŒþÀàÐÍÊÇ·ñÎªÄ¿ÂŒ
+        return S_ISDIR(statbuf.st_mode) != 0;
     }
     return false;
 }
 
-//ÅÐ¶ÏÊÇ·ñÎª³£¹æÎÄŒþ
 bool is_file_xml(const char *path)
 {
     struct stat statbuf;
     if(lstat(path, &statbuf) ==0)
-        return S_ISREG(statbuf.st_mode) != 0;//ÅÐ¶ÏÎÄŒþÊÇ·ñÎª³£¹æÎÄŒþ
-    return false;
+	{
+		return S_ISREG(statbuf.st_mode)!=0;
+	}
+	return false;
 }
 
-//ÅÐ¶ÏÊÇ·ñÊÇÌØÊâÄ¿ÂŒ
 bool is_special_dir_xml(const char *path)
 {
     return strcmp(path, ".") == 0 || strcmp(path, "..") == 0;
 }
 
-//Éú³ÉÍêÕûµÄÎÄŒþÂ·Ÿ¶
 void get_file_path_xml(const char *path, const char *file_name,  char *file_path)
 {
     strcpy(file_path, path);
@@ -42,10 +40,8 @@ void delete_file_xml(const char *path,int *count,char* xmlname)
     char file_path[PATH_MAX];
 	char filename[128];
 struct stat *buf=(struct stat *)malloc(sizeof(struct stat));
-	//get_file_path_xml(path, dir_info->d_name, file_path);
     if(is_file_xml(path))
     {
-        //remove(path);
       (*count)++;
 	if(stat(path,buf)<0)
 	{
@@ -289,10 +285,16 @@ int get_sonstr(char *path,char *filename)
 //judge object_or_bucket_in_put and in post
 //return 1 means bucket and return 0 means object
 
+
+
+/*
+
 int judge_object_or_bucket_in_put(char *filename)
 {
-	char dot='.';
+//	char dot='/';
+	char  dot='.';
 	int i=0;
+	int  num=0;
 	while(filename[i]!=dot&&filename[i]!='\0') 
 	{
 		i++;
@@ -309,4 +311,39 @@ int judge_object_or_bucket_in_put(char *filename)
 		return 0;
 	}
 }
+
+
+
+
+
+*/
+
+
+
+
+int judge_object_or_bucket_in_put(char *filename)
+{
+	char dot='/';
+//	char  dot='.';
+	int i=0;
+	int  num=0;
+	while(filename[i]!='\0') 
+	{
+		if(filename[i]=='/')
+			num++;
+		i++;
+
+	}
+	if(num==2)
+	{
+		printf("37 ****%s is a bucket!\n",__func__);
+		return 1;
+	}
+	else
+	{
+		printf(" is a object!\n");
+		return 0;
+	}
+}
+
 

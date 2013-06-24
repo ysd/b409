@@ -1,10 +1,13 @@
 #include "request_analysis.h"
-#include "container.h"
+#include "s3_server.h"
 #include "object_response_header.h"
 #include "bucket_response_header.h"
 #include "utility.h"
 #include "xml.h"
 #include "xml_s3.h"
+#include "nss.h"
+#include "nss_msg.h"
+
 unsigned int nr_of_uploading_clients=0; 
 int
 request_get(void *cls, struct MHD_Connection *connection,          
@@ -862,22 +865,45 @@ request_post(void *cls, struct MHD_Connection *connection,         \
 	strncpy(send_header.Connection,"close",strlen("close")+1);
 	//printf("request_analysis.c 95line  date is %s \n",send_header.Connection);
 
-	strncpy(send_header.Pathname,url+1,strlen(url));
+	strncpy(send_header.Pathname,url,strlen(url));
 	//printf("request_analysis.c 98 line  url is %s \n",send_header.Pathname);
 	//***************************sender_head end
 
-/*
+	printf("url is %s\n",url);
 	get_sonstr(url,bucket_object);
-	if(judge_object_or_bucket_in_put(bucket_object)>0)
+	if(judge_object_or_bucket_in_put(url)>0)
 	{
 	//***********************POST bucket***********************
 		printf("POST a bucket named %s\n",bucket_object);
+
+		/*
 		if(mkdir(url,S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH)<0)
 		{		
 			printf("create bucket %s error !\n",bucket_object);
 			return 0;
 		}
-		response =MHD_create_response_from_buffer(0,NULL, MHD_RESPMEM_PERSISTENT);
+
+
+*/
+
+//  add create  bucket code in the  follow
+
+		char fp[MAX_PATH],*user,*bucket,*object;
+		bzero(fp,MAX_PATH);
+		strncpy(fp,url,strlen(url));
+		parse_path(fp,&user,&bucket,&object);
+		int fd;
+		connect_to_nss_server(&fd);
+		put_bucket_msg_client(fd,bucket,user);
+
+
+
+
+
+
+		const char *bucketstr ="<html><body>create bucket success!</body></html>";
+	//	response =MHD_create_response_from_buffer(0,NULL, MHD_RESPMEM_PERSISTENT);
+		response =MHD_create_response_from_buffer (strlen (bucketstr),(void *)bucketstr,MHD_RESPMEM_PERSISTENT);
 		if(response)
 		{
 					
@@ -888,10 +914,15 @@ request_post(void *cls, struct MHD_Connection *connection,         \
 		}
 		else
 			return MHD_NO;
+
+
+
+
+
     }				
 	else{
 
-*/
+
 	//printf("%s Post  data: %s",__func__, url);
 	//char *cheek;
     if (NULL == *con_cls)
@@ -907,6 +938,11 @@ request_post(void *cls, struct MHD_Connection *connection,         \
         if (NULL == con_info)
             return MHD_NO;
         con_info->fp = NULL;
+
+
+        con_info->url =(char*)malloc(strlen(url)+1);
+		memset(con_info->url,0,strlen(url)+1);
+		strncpy(con_info->url,url,strlen(url)+1);
 	    //printf("method is %s\n",method);
 		//printf("in answer url is %s\n",url);
 	    //printf("version is %s\n",version);
@@ -987,4 +1023,4 @@ request_post(void *cls, struct MHD_Connection *connection,         \
 }
 
 
-
+}

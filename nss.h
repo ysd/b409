@@ -88,6 +88,7 @@ typedef struct _user_object{
 #define OP_WITHOUT_LOCK		01
 extern int init_name_space(void);
 extern int put_object(char * object_name,char * bucket_name,char * user_name);
+//extern int put_object_client(char * object_name,char * bucket_name,char * user_name);
 extern int get_object(char * object_name,char * bucket_name,char * user_name);
 extern int delete_object(char * object_name,char * bucket_name,char * user_name);
 

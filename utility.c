@@ -83,5 +83,6 @@ void u32_to_str(u32 i,char *buf,u32 bufsiz)
 void u64_to_str(u64 i,char *buf,u32 bufsiz)
 {
 	bzero(buf,bufsiz);
-	snprintf(buf,bufsiz,"%llu",i);
+	//snprintf(buf,bufsiz,"%llu",i);
+	snprintf(buf,bufsiz,"%"PRIu64"",i);
 }

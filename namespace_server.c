@@ -101,5 +101,7 @@ int main()
 	get_bucket(B3,U5,LIST_OBJECT_FILE);
 	get_user(U5,LIST_BUCKET_FILE,GU_LIST_BUCKETS);
 	get_user(U5,ALL_BUCKETS_OBJECTS_FILE,GU_LIST_ALL_BUCKETS_OBJECTS);
+	/* while 1 */
+	/* accept namespace operation */
 	return 0;
 }

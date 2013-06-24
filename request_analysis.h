@@ -2,7 +2,7 @@
 #define REQUEST_ANALYSIS_H
 
 #include <microhttpd.h>
-#include "container.h"
+#include "s3_server.h"
 #include <sys/stat.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -69,6 +69,7 @@ FILE *fp;
 const char *answerstring;
 int answercode;
 char client_ip[128];
+char *url;
 };
 
 static const char *askpage = "<html><body>\n\
